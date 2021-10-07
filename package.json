@@ -2,20 +2,65 @@
   "name": "capgemini-homework-club-backend",
   "version": "1.0.0",
   "description": "Project for Capgemini Homework Club backend",
-  "main": "server/server.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/server.js",
-    "dev": "nodemon server/server.js"
+    "dev": "nodemon -w . --exec \"babel-node ./src/index.js\"",
+    "start": "nodemon -w . --exec \"babel-node ./src/index.js\"",
+    "lint:fix": "./node_modules/.bin/eslint --fix src",
+    "build": "babel src --out-dir dist --copy-files",
+    "serve": "node dist/index.js",
+    "prepare": "husky install"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
-    "eslint": "^7.32.0",
-    "express": "^4.17.1"
+    "dayjs": "^1.10.7",
+    "dotenv": "^10.0.0",
+    "eslint-plugin-react": "^7.26.1",
+    "express": "^4.17.1",
+    "express-jwt": "^6.1.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "nodemon": "^2.0.13"
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.8",
+    "@babel/node": "^7.15.8",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.15.8",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-flowtype": "^6.1.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.2.0",
+    "nodemon": "^2.0.13",
+    "prettier": "^2.4.1"
+  },
+  "repository": {
+    "url": ""
+  },
+  "license": "ISC",
+  "keywords": [
+    "node",
+    "glitch",
+    "express"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
