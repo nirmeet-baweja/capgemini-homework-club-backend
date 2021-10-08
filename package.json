@@ -19,7 +19,10 @@
     "eslint-plugin-react": "^7.26.1",
     "express": "^4.17.1",
     "express-jwt": "^6.1.0",
-    "lodash": "^4.17.21"
+    "knex": "^0.95.11",
+    "knex-migrate": "^1.7.4",
+    "lodash": "^4.17.21",
+    "pg": "^8.7.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.15.7",
