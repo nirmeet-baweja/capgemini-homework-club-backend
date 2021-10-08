@@ -1,6 +1,6 @@
 exports.up = function (knex) {
   return knex.schema.createTable('class_sign_ups', (table) => {
-    table.primary(['class_id', 'user_id'], 'id')
+    table.primary(['class_id', 'user_id'], 'sign_up_id')
     table.integer('class_id').references('id').inTable('classes')
     table.integer('user_id').references('id').inTable('users')
     table.boolean('is_present').notNullable().defaultTo(true)
