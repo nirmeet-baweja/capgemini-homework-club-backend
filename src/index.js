@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
 // import new routes from routes
-import { admins, common, students, volunteers } from './routes'
+import { admins, auth, common, students, volunteers } from './routes'
 
 dotenv.config()
 
@@ -13,6 +13,7 @@ const startServer = () => {
     // localhost:3001
     .get('/health', (reg, res) => res.sendStatus(200))
     .use('/admins', admins)
+    .use('/auth', auth)
     .use('/students', students)
     .use('/volunteers', volunteers)
     .use('/data', common)
