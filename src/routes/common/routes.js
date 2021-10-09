@@ -1,11 +1,11 @@
 import express from 'express'
 import {
-  getListOfStudyGroups,
   getRoles,
   getUsers,
   getVolunteers,
   getStudents,
   getClasses,
+  getUpcomingClasses,
 } from './controllers'
 
 const router = express.Router()
@@ -15,6 +15,6 @@ router.get('/users', getUsers)
 router.get('/volunteers', getVolunteers)
 router.get('/students', getStudents)
 router.get('/classes', getClasses)
-router.get('/study-groups', getListOfStudyGroups)
+router.get('/upcoming-classes', getUpcomingClasses)
 
 export default router

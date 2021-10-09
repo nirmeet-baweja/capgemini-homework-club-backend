@@ -1,43 +1,56 @@
-const knex = require('../../knex')
+import services from './services'
 
-export const getListOfStudyGroups = async (req, res) => {
+export const getRoles = async (req, res) => {
   try {
-    return res.status(200).send([{ id: 'return list of HWC study group' }])
+    const roles = await services.getRoles()
+    return res.json(roles)
   } catch (err) {
-    console.log(err)
-    return res.status(400).send('Error')
+    return res.status(404).send('Roles not found.')
   }
 }
 
-export const getRoles = async (req, res) => {
-  const roles = await knex('roles').select('*').orderBy('id')
-  res.json(roles)
+export const getClasses = async (req, res) => {
+  try {
+    const classes = await services.getClasses()
+    return res.json(classes)
+  } catch (err) {
+    return res.status(404).send('Classes not found.')
+  }
+}
+
+export const getUpcomingClasses = async (req, res) => {
+  const { today } = req.body // date should be in format "yyyy-mm-dd"
+  try {
+    const classes = await services.getUpcomingClasses(today)
+    return res.json(classes)
+  } catch (err) {
+    return res.status(404).send('Classes not found.')
+  }
 }
 
 export const getUsers = async (req, res) => {
-  const users = await knex('users')
-    .select('firstname', 'last_name', 'email', 'role_id', 'cohort_id')
-    .orderBy('id')
-  res.json(users)
+  try {
+    const users = await services.getUsers()
+    return res.json(users)
+  } catch (err) {
+    return res.status(404).send('Users not found.')
+  }
 }
 
 export const getVolunteers = async (req, res) => {
-  const volunteers = await knex('users')
-    .select('firstname', 'last_name', 'email')
-    .where('role_id', 2)
-    .orderBy('id')
-  res.json(volunteers)
+  try {
+    const volunteers = await services.getVolunteers()
+    return res.json(volunteers)
+  } catch (err) {
+    return res.status(404).send('Volunteers not found.')
+  }
 }
 
 export const getStudents = async (req, res) => {
-  const students = await knex('users')
-    .select('firstname', 'last_name', 'email', 'cohort_id')
-    .where('role_id', 3)
-    .orderBy('id')
-  res.json(students)
-}
-
-export const getClasses = async (req, res) => {
-  const classes = await knex('classes').select('*').orderBy('id')
-  res.json(classes)
+  try {
+    const students = await services.getStudents()
+    return res.json(students)
+  } catch (err) {
+    return res.status(404).send('Students not found.')
+  }
 }
