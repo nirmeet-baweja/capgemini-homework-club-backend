@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon -w . --exec \"babel-node ./src/index.js\"",
-    "start": "nodemon -w . --exec \"babel-node ./src/index.js\"",
+    "start": "node -w . --exec \"babel-node ./src/index.js\"",
     "lint:fix": "./node_modules/.bin/eslint --fix src",
     "build": "babel src --out-dir dist --copy-files",
     "serve": "node dist/index.js",
