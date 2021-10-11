@@ -38,6 +38,7 @@ exports.seed = async function (knex) {
     const userSignUp = {
       user_id: userId,
       class_id: classId,
+      skill_id: getRandomIntInclusive(1, 9),
       is_cancelled: isCancelled,
       is_present: isPresent,
       comments:

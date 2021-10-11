@@ -3,6 +3,7 @@ exports.up = function (knex) {
     table.primary(['class_id', 'user_id'], 'sign_up_id')
     table.integer('class_id').references('id').inTable('classes')
     table.integer('user_id').references('id').inTable('users')
+    table.integer('skill_id').references('id').inTable('skills')
     table.boolean('is_present').notNullable().defaultTo(true)
     table.boolean('is_cancelled').notNullable().defaultTo(false)
     table.string('comments', 255)
