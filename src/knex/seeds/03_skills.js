@@ -13,6 +13,7 @@ exports.seed = function (knex) {
         { id: 6, name: 'Node.js' },
         { id: 7, name: 'Databases - SQL' },
         { id: 8, name: 'Databases - No SQL' },
+        { id: 9, name: 'Personal Development' },
       ])
     )
 }
