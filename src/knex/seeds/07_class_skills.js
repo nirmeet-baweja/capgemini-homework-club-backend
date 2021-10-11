@@ -23,7 +23,7 @@ exports.seed = async function (knex) {
 
     // create an array for skills for the classId
     while (skillCount < numOfSkills) {
-      const skill = getRandomIntInclusive(1, numOfSkills)
+      const skill = getRandomIntInclusive(1, maxNumSkills)
       if (!skills.includes(skill)) {
         skills.push(skill)
         skillCount += 1
