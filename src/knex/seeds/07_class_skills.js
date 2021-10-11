@@ -10,6 +10,9 @@ exports.seed = async function (knex) {
   // get the list of classes
   const classesId = await knex('classes').select('id').orderBy('id')
 
+  // get the count of all the skills
+  const totalSkillCount = await knex('skills').count('id')
+
   const maxNumSkills = 4
 
   // array to store the rows for class_skills table
@@ -23,7 +26,7 @@ exports.seed = async function (knex) {
 
     // create an array for skills for the classId
     while (skillCount < numOfSkills) {
-      const skill = getRandomIntInclusive(1, maxNumSkills)
+      const skill = getRandomIntInclusive(1, totalSkillCount[0].count)
       if (!skills.includes(skill)) {
         skills.push(skill)
         skillCount += 1
