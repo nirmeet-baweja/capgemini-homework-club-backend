@@ -5,10 +5,12 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon -w . --exec \"babel-node ./src/index.js\"",
-    "start": "babel-node ./src/index.js",
     "lint:fix": "./node_modules/.bin/eslint --fix src",
     "build": "babel src --out-dir dist --copy-files",
     "serve": "node dist/index.js",
+    "build:clean": "rm -rf dist",
+    "prebuild": "npm run build:clean",
+    "start:prod": "npm run build && node ./dist/index.js",
     "prepare": "husky install"
   },
   "dependencies": {
