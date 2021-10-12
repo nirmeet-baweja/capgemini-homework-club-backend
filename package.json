@@ -10,7 +10,7 @@
     "serve": "node dist/index.js",
     "build:clean": "rm -rf dist",
     "prebuild": "npm run build:clean",
-    "start": "node ./dist/index.js",
+    "start": "npm run build && node ./dist/index.js",
     "prepare": "husky install"
   },
   "dependencies": {
