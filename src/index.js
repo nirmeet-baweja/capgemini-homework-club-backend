@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
+import config from './config'
 // import new routes from routes
 import { admins, auth, common, students, volunteers } from './routes'
 
@@ -17,7 +18,9 @@ const startServer = () => {
     .use('/students', students)
     .use('/volunteers', volunteers)
     .use('/data', common)
-    .listen(3001, () => console.log(`Listening on ${server.address().port}`))
+    .listen(config.port || 3001, () =>
+      console.log(`Listening on ${server.address().port}`)
+    )
   return app
 }
 
