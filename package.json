@@ -5,15 +5,16 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon -w . --exec \"babel-node ./src/index.js\"",
+    "start": "nodemon -w . --exec \"babel-node ./src/index.js\"",
     "lint:fix": "./node_modules/.bin/eslint --fix src",
-    "build": "babel src --out-dir dist --copy-files",
-    "serve": "node dist/index.js",
-    "build:clean": "rm -rf dist",
-    "prebuild": "npm run build:clean",
-    "start": "npm run build && node ./dist/index.js",
     "prepare": "husky install"
   },
   "dependencies": {
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.8",
+    "@babel/node": "^7.15.8",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.15.8",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dayjs": "^1.10.7",
@@ -23,14 +24,10 @@
     "knex": "^0.95.11",
     "knex-migrate": "^1.7.4",
     "lodash": "^4.17.21",
+    "nodemon": "^2.0.13",
     "pg": "^8.7.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.15.7",
-    "@babel/core": "^7.15.8",
-    "@babel/node": "^7.15.8",
-    "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.15.8",
     "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.26.1",
     "eslint-config-airbnb": "^18.2.1",
@@ -45,7 +42,6 @@
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^7.0.2",
     "lint-staged": "^11.2.0",
-    "nodemon": "^2.0.13",
     "prettier": "^2.4.1"
   },
   "repository": {
