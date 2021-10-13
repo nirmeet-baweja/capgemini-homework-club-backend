@@ -1,8 +1,9 @@
 import express from 'express'
-import { getListOfStudyGroups } from './controllers'
+import { getRoles, getUpcomingClasses } from './controllers'
 
 const router = express.Router()
 // localhost:3001/data
-router.get('/study-groups', getListOfStudyGroups)
+router.get('/roles', getRoles)
+router.get('/upcoming-classes', getUpcomingClasses)
 
 export default router
