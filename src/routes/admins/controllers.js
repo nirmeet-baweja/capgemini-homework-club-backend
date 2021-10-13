@@ -3,12 +3,20 @@ import services from './services'
 
 export const getClasses = async (req, res) => {
   try {
-    console.log('in controller')
     const classes = await services.getClasses()
-    console.log('classes fetched')
     return res.json(classes)
   } catch (err) {
-    return res.status(404).send(`Classes not found. Error : ${err}`)
+    return res.status(404).send('Classes not found.')
+  }
+}
+
+export const getClassDetails = async (req, res) => {
+  try {
+    const { classId } = req.params
+    const classDetails = await services.getClassDetails(classId)
+    return res.json(classDetails)
+  } catch (err) {
+    return res.status(404).send('Class not found.')
   }
 }
 
@@ -38,13 +46,3 @@ export const getStudents = async (req, res) => {
     return res.status(404).send('Students not found.')
   }
 }
-
-// export const getAdmin = async (req, res) => {
-//   // const { userId } = req.params;
-//   try {
-//     return res.status(200).send({ user: 'admin data' })
-//   } catch (err) {
-//     console.log(err)
-//     return res.status(400).send('Admin not found')
-//   }
-// }
