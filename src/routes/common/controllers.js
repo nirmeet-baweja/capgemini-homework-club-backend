@@ -18,3 +18,13 @@ export const getUpcomingClasses = async (req, res) => {
     return res.status(404).send('Classes not found.')
   }
 }
+
+export const getPastClasses = async (req, res) => {
+  const today = new Date() // date should be in format "yyyy-mm-dd"
+  try {
+    const classes = await services.getPastClasses(today)
+    return res.json(classes)
+  } catch (err) {
+    return res.status(404).send('Classes not found.')
+  }
+}
