@@ -1,5 +1,4 @@
 import services from './services'
-// import knex from '../../knex'
 
 export const getClasses = async (req, res) => {
   try {
