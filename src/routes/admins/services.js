@@ -50,7 +50,11 @@ const getUserSkills = async (userID) => {
 const getStudentsSignedUp = async (classID) => {
   // get the students signed up for the class
   const listOfStudents = await knex('class_sign_ups as csu')
-    .select('u.firstname', 'u.last_name', 's.name as skill')
+    .select(
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      's.name as skill'
+    )
     .join('users as u', 'u.id', 'csu.user_id')
     .join('skills as s', 's.id', 'csu.skill_id')
     .where('csu.class_id', classID)
@@ -62,7 +66,7 @@ const getStudentsSignedUp = async (classID) => {
 const getVolunteersSignedUp = async (classID) => {
   // get the volunteers signed up for the class
   const listOfVolunteers = await knex('class_sign_ups as csu')
-    .select('u.id', 'u.firstname', 'u.last_name')
+    .select('u.id', 'u.firstname as firstName', 'u.last_name as lastName')
     .join('users as u', 'u.id', 'csu.user_id')
     .where('csu.class_id', classID)
     .andWhere('u.role_id', 2)
@@ -106,6 +110,7 @@ const getClasses = async () => {
     )
   }
 
+  // get the number of students and volunteers attending a class
   const fetchNumOfAttendees = async () => {
     await Promise.all(
       // get the number of students signed up for the class
@@ -149,6 +154,7 @@ const getClassDetails = async (classID) => {
   const numOfVolunteers = await getNumOfVolunteers(classID)
   const listOfStudents = await getStudentsSignedUp(classID)
   const listOfVolunteers = await getVolunteersSignedUp(classID)
+
   return {
     ...classDetails[0],
     numOfStudents,
@@ -160,15 +166,22 @@ const getClassDetails = async (classID) => {
 }
 
 const getUsers = async () => {
-  const users = await knex('users')
-    .select('firstname', 'last_name', 'email', 'role_id', 'cohort_id')
-    .orderBy('id')
+  const users = await knex('users as u')
+    .select(
+      'u.id',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'r.name as role'
+    )
+    .join('roles as r', 'r.id', 'u.role_id')
+    .orderBy('u.id')
   return users
 }
 
 const getVolunteers = async () => {
   const volunteers = await knex('users')
-    .select('id', 'firstname', 'last_name', 'email')
+    .select('id', 'firstname as firstName', 'last_name as lastName', 'email')
     .where('role_id', 2)
     .orderBy('id')
 
@@ -190,7 +203,13 @@ const getVolunteers = async () => {
 
 const getStudents = async () => {
   const students = await knex('users as u')
-    .select('u.firstname', 'u.last_name', 'u.email', 'c.name as cohort')
+    .select(
+      'u.id',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'c.name as cohort'
+    )
     .join('cohorts as c', 'c.id', 'u.cohort_id')
     .where('role_id', 3)
     .orderBy('u.id')
