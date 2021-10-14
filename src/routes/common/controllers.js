@@ -9,6 +9,33 @@ export const getRoles = async (req, res) => {
   }
 }
 
+export const getSkills = async (req, res) => {
+  try {
+    const skills = await services.getSkills()
+    return res.json(skills)
+  } catch (err) {
+    return res.status(404).send('Skills not found.')
+  }
+}
+
+export const getCohorts = async (req, res) => {
+  try {
+    const cohorts = await services.getCohorts()
+    return res.json(cohorts)
+  } catch (err) {
+    return res.status(404).send('Cohorts not found.')
+  }
+}
+
+export const getClasses = async (req, res) => {
+  try {
+    const classes = await services.getClasses()
+    return res.json(classes)
+  } catch (err) {
+    return res.status(404).send('Classes not found.')
+  }
+}
+
 export const getUpcomingClasses = async (req, res) => {
   const today = new Date() // date should be in format "yyyy-mm-dd"
   try {
