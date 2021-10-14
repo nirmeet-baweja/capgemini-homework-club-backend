@@ -27,13 +27,11 @@ const getNumOfVolunteers = async (classId) => {
 
 const getClassSkills = async (classId) => {
   const classSkills = await knex('class_skills as cs')
-    .select('s.name')
+    .select('s.id', 's.name')
     .join('skills as s', 's.id', 'cs.skill_id')
     .where('cs.class_id', classId)
 
-  const skills = classSkills.map((classSkill) => classSkill.name)
-
-  return skills
+  return classSkills
 }
 
 /* ************************************************************************* */
@@ -147,7 +145,6 @@ const getClassWithId = async (classId) => {
     .select('id', 'date', 'comments', 'call_link as callLink')
     .where('id', classId)
 
-  console.log(classDetails)
   if (classDetails.length === 0) {
     throw new Error('Invalid class ID.')
   }
