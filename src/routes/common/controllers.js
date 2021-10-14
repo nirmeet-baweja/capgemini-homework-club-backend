@@ -27,9 +27,9 @@ export const getCohorts = async (req, res) => {
   }
 }
 
-export const getClasses = async (req, res) => {
+export const getAllClasses = async (req, res) => {
   try {
-    const classes = await services.getClasses()
+    const classes = await services.getClasses('all')
     return res.json(classes)
   } catch (err) {
     return res.status(404).send('Classes not found.')
@@ -39,8 +39,6 @@ export const getClasses = async (req, res) => {
 export const getClassWithId = async (req, res) => {
   try {
     const { classId } = req.params
-    // const classId = 1
-    console.log(classId)
     const classDetails = await services.getClassWithId(classId)
     return res.json(classDetails)
   } catch (err) {
@@ -49,9 +47,9 @@ export const getClassWithId = async (req, res) => {
 }
 
 export const getUpcomingClasses = async (req, res) => {
-  const today = new Date() // date should be in format "yyyy-mm-dd"
+  // const today = new Date() // date should be in format "yyyy-mm-dd"
   try {
-    const classes = await services.getUpcomingClasses(today)
+    const classes = await services.getClasses('upcoming')
     return res.json(classes)
   } catch (err) {
     return res.status(404).send('Classes not found.')
@@ -59,9 +57,9 @@ export const getUpcomingClasses = async (req, res) => {
 }
 
 export const getPastClasses = async (req, res) => {
-  const today = new Date() // date should be in format "yyyy-mm-dd"
+  // const today = new Date() // date should be in format "yyyy-mm-dd"
   try {
-    const classes = await services.getPastClasses(today)
+    const classes = await services.getClasses('past')
     return res.json(classes)
   } catch (err) {
     return res.status(404).send('Classes not found.')

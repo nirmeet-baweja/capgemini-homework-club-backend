@@ -3,7 +3,7 @@ import {
   getRoles,
   getSkills,
   getCohorts,
-  getClasses,
+  getAllClasses,
   getClassWithId,
   getUpcomingClasses,
   getPastClasses,
@@ -14,7 +14,7 @@ const router = express.Router()
 router.get('/roles', getRoles)
 router.get('/skills', getSkills)
 router.get('/cohorts', getCohorts)
-router.get('/classes', getClasses)
+router.get('/classes', getAllClasses)
 router.get('/classes/:classId', getClassWithId)
 router.get('/upcoming-classes', getUpcomingClasses)
 router.get('/past-classes', getPastClasses)

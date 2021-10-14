@@ -53,17 +53,50 @@ const getCohorts = async () => {
   return cohorts
 }
 
-const getClasses = async () => {
+const getClasses = async (type) => {
+  const today = new Date() // date should be in format "yyyy-mm-dd"
+
   // get the data from classes table
-  const classes = await knex('classes')
-    .select(
-      'id',
-      'date',
-      'comments',
-      'call_link as callLink',
-      'is_submitted as isSubmitted'
-    )
-    .orderBy('date')
+  let classes
+  switch (type) {
+    case 'all':
+      classes = await knex('classes')
+        .select(
+          'id',
+          'date',
+          'comments',
+          'call_link as callLink',
+          'is_submitted as isSubmitted'
+        )
+        .orderBy('date')
+      break
+    case 'upcoming':
+      classes = await knex('classes as c')
+        .select(
+          'c.id',
+          'c.date',
+          'c.comments',
+          'c.call_link as callLink',
+          'c.is_submitted as isSubmitted'
+        )
+        .where('date', '>=', today)
+        .orderBy('date')
+      break
+    case 'past':
+      classes = await knex('classes as c')
+        .select(
+          'c.id',
+          'c.date',
+          'c.comments',
+          'c.call_link as callLink',
+          'c.is_submitted as isSubmitted'
+        )
+        .where('date', '<=', today)
+        .orderBy('date')
+      break
+    default:
+      classes = undefined
+  }
 
   // function to fetch the skills for each class
   const fetchClassSkills = async () => {
@@ -131,28 +164,10 @@ const getClassWithId = async (classId) => {
   }
 }
 
-const getUpcomingClasses = async (today) => {
-  const classes = await knex('classes as c')
-    .select('c.id', 'c.date', 'c.comments', 'c.call_link', 'c.is_submitted')
-    .where('date', '>=', today)
-    .orderBy('date')
-  return classes
-}
-
-const getPastClasses = async (today) => {
-  const classes = await knex('classes as c')
-    .select('c.id', 'c.date', 'c.comments', 'c.call_link', 'c.is_submitted')
-    .where('date', '<=', today)
-    .orderBy('date')
-  return classes
-}
-
 export default {
   getRoles,
   getSkills,
   getCohorts,
   getClasses,
   getClassWithId,
-  getUpcomingClasses,
-  getPastClasses,
 }
