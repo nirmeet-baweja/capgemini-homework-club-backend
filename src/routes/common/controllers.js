@@ -36,6 +36,18 @@ export const getClasses = async (req, res) => {
   }
 }
 
+export const getClassWithId = async (req, res) => {
+  try {
+    const { classId } = req.params
+    // const classId = 1
+    console.log(classId)
+    const classDetails = await services.getClassWithId(classId)
+    return res.json(classDetails)
+  } catch (err) {
+    return res.status(404).send('Class not found.')
+  }
+}
+
 export const getUpcomingClasses = async (req, res) => {
   const today = new Date() // date should be in format "yyyy-mm-dd"
   try {

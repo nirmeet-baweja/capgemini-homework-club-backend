@@ -4,6 +4,7 @@ import {
   getSkills,
   getCohorts,
   getClasses,
+  getClassWithId,
   getUpcomingClasses,
   getPastClasses,
 } from './controllers'
@@ -14,6 +15,7 @@ router.get('/roles', getRoles)
 router.get('/skills', getSkills)
 router.get('/cohorts', getCohorts)
 router.get('/classes', getClasses)
+router.get('/classes/:classId', getClassWithId)
 router.get('/upcoming-classes', getUpcomingClasses)
 router.get('/past-classes', getPastClasses)
 

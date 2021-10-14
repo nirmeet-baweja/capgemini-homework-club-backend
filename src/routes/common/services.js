@@ -3,33 +3,33 @@ import knex from '../../knex'
 /* ************************************************************************* */
 /* Helper functions */
 
-const getNumOfStudents = async (classID) => {
+const getNumOfStudents = async (classId) => {
   // get the number of students signed up for the class
   const numOfStudents = await knex('class_sign_ups as csu')
     .join('users as u', 'u.id', 'csu.user_id')
-    .where('csu.class_id', classID)
+    .where('csu.class_id', classId)
     .andWhere('u.role_id', 3)
     .count('u.id')
 
   return numOfStudents[0].count
 }
 
-const getNumOfVolunteers = async (classID) => {
+const getNumOfVolunteers = async (classId) => {
   // get the number of volunteers signed up for the class
   const numOfVolunteers = await knex('class_sign_ups as csu')
     .join('users as u', 'u.id', 'csu.user_id')
-    .where('csu.class_id', classID)
+    .where('csu.class_id', classId)
     .andWhere('u.role_id', 2)
     .count('u.id')
 
   return numOfVolunteers[0].count
 }
 
-const getClassSkills = async (classID) => {
+const getClassSkills = async (classId) => {
   const classSkills = await knex('class_skills as cs')
     .select('s.name')
     .join('skills as s', 's.id', 'cs.skill_id')
-    .where('cs.class_id', classID)
+    .where('cs.class_id', classId)
 
   const skills = classSkills.map((classSkill) => classSkill.name)
 
@@ -108,6 +108,29 @@ const getClasses = async () => {
   return classes
 }
 
+const getClassWithId = async (classId) => {
+  // get the data from classes table
+  const classDetails = await knex('classes')
+    .select('id', 'date', 'comments', 'call_link as callLink')
+    .where('id', classId)
+
+  console.log(classDetails)
+  if (classDetails.length === 0) {
+    throw new Error('Invalid class ID.')
+  }
+
+  const skills = await getClassSkills(classId)
+  const numOfStudents = await getNumOfStudents(classId)
+  const numOfVolunteers = await getNumOfVolunteers(classId)
+
+  return {
+    ...classDetails[0],
+    skills,
+    numOfStudents,
+    numOfVolunteers,
+  }
+}
+
 const getUpcomingClasses = async (today) => {
   const classes = await knex('classes as c')
     .select('c.id', 'c.date', 'c.comments', 'c.call_link', 'c.is_submitted')
@@ -129,6 +152,7 @@ export default {
   getSkills,
   getCohorts,
   getClasses,
+  getClassWithId,
   getUpcomingClasses,
   getPastClasses,
 }
