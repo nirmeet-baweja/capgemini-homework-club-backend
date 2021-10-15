@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const knex = require('../../knex')
 
 const saltRounds = 10
@@ -152,6 +153,31 @@ const volunteerSignUp = async (req) => {
   return { message: 'Volunteer signed up successfully!' }
 }
 
+export const signIn = async (req, res, next) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, saltRounds)
+    const { email, password } = req.body
+    const user = await knex('users').first('*').where({ email })
+    if (!user) {
+      console.log('No such user found:', req.body.email)
+      res.status(401).send('Wrong email and/or password')
+    } else {
+      const validPass = await bcrypt.compare(password, hash)
+      const accessToken = jwt.sign(
+        JSON.stringify(user),
+        process.env.TOKEN_SECRET
+      )
+      if (validPass) {
+        res.json({ accessToken })
+      } else {
+        console.log('Incorrect password for user:', email)
+        res.status(401).send('Wrong username and/or password')
+      }
+    }
+  } catch (err) {
+    next(err)
+  }
+}
 export default {
   validateStudentSignUp,
   studentSignUp,
