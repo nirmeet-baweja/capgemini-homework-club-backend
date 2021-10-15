@@ -1,14 +1,5 @@
 import services from './services'
 
-export const getClasses = async (req, res) => {
-  try {
-    const classes = await services.getClasses()
-    return res.json(classes)
-  } catch (err) {
-    return res.status(404).send('Classes not found.')
-  }
-}
-
 export const getClassDetails = async (req, res) => {
   try {
     const { classId } = req.params
