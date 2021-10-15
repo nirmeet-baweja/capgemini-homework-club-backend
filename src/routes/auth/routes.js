@@ -1,6 +1,6 @@
 import express from 'express'
-import { studentSignUp, volunteerSignUp } from './controllers'
-import { signIn } from './services'
+import { studentSignUp, volunteerSignUp, signIn } from './controllers'
+// import { signIn } from './services'
 
 const router = express.Router()
 // localhost:3001/auth

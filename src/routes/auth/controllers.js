@@ -30,3 +30,17 @@ export const volunteerSignUp = async (req, res) => {
     return res.status(400).send('something went wrong')
   }
 }
+export const signIn = async (req, res) => {
+  try {
+    const error = await services.verifyToken(req.body)
+
+    if (error) {
+      return res.status(400).send(error)
+    }
+
+    const result = await services.signIn(req) // store into database
+    return res.status(200).send(result)
+  } catch (err) {
+    return res.status(400).send('Invalid Token')
+  }
+}

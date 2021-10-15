@@ -1,5 +1,7 @@
+require('dotenv').config()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+// const decode = require('jwt-decode')
 const knex = require('../../knex')
 
 const saltRounds = 10
@@ -153,7 +155,7 @@ const volunteerSignUp = async (req) => {
   return { message: 'Volunteer signed up successfully!' }
 }
 
-export const signIn = async (req, res, next) => {
+const signIn = async (req, res, next) => {
   try {
     const hash = await bcrypt.hash(req.body.password, saltRounds)
     const { email, password } = req.body
@@ -178,9 +180,27 @@ export const signIn = async (req, res, next) => {
     next(err)
   }
 }
+const verifyToken = (req, res) => {
+  const token = req.headers.authorization.split(' ')[1]
+  jwt.verify(token, process.env.TOKEN_SECRET, (error, decodedToken) => {
+    if (error) {
+      res.status(401).json({
+        message: 'Unauthorized Access!',
+      })
+    } else {
+      res.status(200).json({
+        email: decodedToken.email,
+        password: decodedToken.password,
+      })
+    }
+  })
+}
+
 export default {
   validateStudentSignUp,
   studentSignUp,
   validateVolunteerSignUp,
   volunteerSignUp,
+  signIn,
+  verifyToken,
 }
