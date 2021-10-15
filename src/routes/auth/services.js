@@ -47,6 +47,9 @@ const areValidSkills = async (volunteerSkills) => {
   return everyElement
 }
 
+const generateAccessToken = (email) =>
+  jwt.sign(email, process.env.TOKEN_SECRET, { expiresIn: '1hr' })
+
 /* *************************************************************** */
 
 const validateStudentSignUp = async (req) => {
@@ -81,8 +84,8 @@ const validateStudentSignUp = async (req) => {
 }
 
 const studentSignUp = async (req) => {
-  const hash = await bcrypt.hash(req.body.password, saltRounds)
-
+  // const hash = await bcrypt.hash(req.body.password, saltRounds)
+  const hash = req.body.password
   const user = {
     firstname: req.body.firstName,
     last_name: req.body.lastName,
@@ -155,31 +158,32 @@ const volunteerSignUp = async (req) => {
   return { message: 'Volunteer signed up successfully!' }
 }
 
-const signIn = async (req, res, next) => {
-  try {
-    const hash = await bcrypt.hash(req.body.password, saltRounds)
-    const { email, password } = req.body
-    const user = await knex('users').first('*').where({ email })
-    if (!user) {
-      console.log('No such user found:', req.body.email)
-      res.status(401).send('Wrong email and/or password')
-    } else {
-      const validPass = await bcrypt.compare(password, hash)
-      const accessToken = jwt.sign(
-        JSON.stringify(user),
-        process.env.TOKEN_SECRET
-      )
-      if (validPass) {
-        res.json({ accessToken })
-      } else {
-        console.log('Incorrect password for user:', email)
-        res.status(401).send('Wrong username and/or password')
-      }
+const signIn = async (req) => {
+  const { email, password } = req.body
+  const hashedPassword = await bcrypt.hash(password, saltRounds)
+  console.log('hashedPassword')
+  console.log(hashedPassword)
+  const user = await knex('users')
+    .first('*')
+    .where('email', email)
+    .orderBy('id')
+  console.log(user)
+
+  if (!user) {
+    console.log('No such user found:', req.body.email)
+    throw new Error('Wrong email and/or password.')
+  } else {
+    // const validPass = await bcrypt.compare(user.password, hashedPassword)
+    const validPass = password === user.password
+    if (validPass) {
+      const token = generateAccessToken({ email })
+      return token
     }
-  } catch (err) {
-    next(err)
+    console.log('Incorrect password for user:', email)
+    throw new Error('Wrong username and/or password.')
   }
 }
+
 const verifyToken = (req, res) => {
   const token = req.headers.authorization.split(' ')[1]
   jwt.verify(token, process.env.TOKEN_SECRET, (error, decodedToken) => {
