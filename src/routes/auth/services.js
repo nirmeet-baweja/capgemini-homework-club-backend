@@ -95,9 +95,12 @@ const studentSignUp = async (req) => {
     cohort_id: req.body.cohortId,
   }
 
-  await knex('users').insert(user)
-
-  return { message: 'Student signed up successfully!' }
+  const [userId] = await knex('users').insert(user, 'id')
+  if (user) {
+    const token = generateAccessToken({ user_id: userId })
+    return token
+  }
+  throw new Error('Please check your details and try again.')
 }
 
 const validateVolunteerSignUp = async (req) => {
@@ -154,8 +157,11 @@ const volunteerSignUp = async (req) => {
   }))
 
   await knex('user_skills').insert(userSkills)
-
-  return { message: 'Volunteer signed up successfully!' }
+  if (user) {
+    const token = generateAccessToken({ user_id: userId })
+    return token
+  }
+  throw new Error('Please check your details and try again.')
 }
 
 const signIn = async (req) => {
