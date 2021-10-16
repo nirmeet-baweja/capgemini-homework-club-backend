@@ -160,21 +160,16 @@ const volunteerSignUp = async (req) => {
 
 const signIn = async (req) => {
   const { email, password } = req.body
-  const hashedPassword = await bcrypt.hash(password, saltRounds)
-  console.log('hashedPassword')
-  console.log(hashedPassword)
   const user = await knex('users')
     .first('*')
     .where('email', email)
     .orderBy('id')
-  console.log(user)
-
   if (!user) {
     console.log('No such user found:', req.body.email)
     throw new Error('Wrong email and/or password.')
   } else {
-    // const validPass = await bcrypt.compare(user.password, hashedPassword)
-    const validPass = password === user.password
+    const validPass = await bcrypt.compare(password, user.password)
+    // const validPass = password === user.password
     if (validPass) {
       const token = generateAccessToken({ email })
       return token
