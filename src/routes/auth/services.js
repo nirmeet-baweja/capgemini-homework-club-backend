@@ -52,11 +52,15 @@ const generateAccessToken = (email) =>
 /* *************************************************************** */
 
 const signIn = async (req) => {
+  console.log('sign in ')
   const { email, password } = req.body
-  const user = await knex('users')
-    .first('id', 'email', 'password', 'role_id as roleId')
-    .where('email', email)
-    .orderBy('id')
+  const [user] = await knex('users as u')
+    .join('roles as r', 'r.id', 'u.role_id')
+    .select('u.id as userId', 'u.email', 'u.password', 'r.name as role')
+    .where('u.email', email)
+    .orderBy('u.id')
+
+  console.log(user)
 
   if (!user) {
     console.log(`No such user found: ${email}`)
@@ -64,7 +68,10 @@ const signIn = async (req) => {
   } else {
     const validPass = await bcrypt.compare(password, user.password)
     if (validPass) {
-      const token = generateAccessToken(user)
+      // remove password from token
+      // send the roles, email, id
+      const { userId, role } = user
+      const token = generateAccessToken({ userId, email, role })
       return token
     }
     console.log(`Incorrect password for user: ${email}`)
@@ -118,11 +125,13 @@ const studentSignUp = async (req) => {
   const [userId] = await knex('users').insert(user, 'id')
 
   const [createdUser] = await knex('users')
-    .select('id', 'email', 'password', 'role_id as roleId')
+    .select('u.id as userId', 'u.email', 'r.name as role')
+    .join('roles as r', 'r.id', 'u.role_id')
     .where('id', userId)
 
+  // do the same for volunteer
   if (createdUser) {
-    return signIn(req)
+    return generateAccessToken(createdUser)
   }
 
   throw new Error('Please check your details and try again.')

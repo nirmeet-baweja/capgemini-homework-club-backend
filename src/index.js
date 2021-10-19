@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 // import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
-import { authHelper, checkAdmin } from './utils'
+import { authHelper } from './utils'
 import config from './config'
 // import new routes from routes
 import { admins, auth, common, students, volunteers } from './routes'
@@ -13,18 +13,11 @@ const startServer = () => {
   const app = express()
     .use(cors())
     .use(express.json({ limit: '50mb', parameterLimit: 50000 }))
-    // .use(
-    //   jwt({
-    //     secret: config.tokenSecret,
-    //   }).unless({
-    //     path: ['/auth/sign-in', '/auth/sign-up'],
-    //   })
-    // )
-    // localhost:3001
-    .get('/health', (reg, res) => res.sendStatus(200))
-    .use('/admins', checkAdmin, admins)
     .use('/auth', auth)
+    .get('/health', (reg, res) => res.sendStatus(200))
     .use(authHelper)
+    // localhost:3001
+    .use('/admins', admins)
     .use('/students', students)
     .use('/volunteers', volunteers)
     .use('/data', common)
