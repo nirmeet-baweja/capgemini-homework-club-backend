@@ -36,3 +36,13 @@ export const getStudents = async (req, res) => {
     return res.status(404).send('Students not found.')
   }
 }
+
+export const updateClassAttendance = async (req, res) => {
+  try {
+    // const { classId } = req.params
+    const classDetails = await services.updateClassAttendance(req)
+    return res.json(classDetails)
+  } catch (err) {
+    return res.status(404).send('Class not found.')
+  }
+}

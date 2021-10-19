@@ -28,7 +28,9 @@ const getStudentsSignedUp = async (classId) => {
       'u.id',
       'u.firstname as firstName',
       'u.last_name as lastName',
-      's.name as skill'
+      's.name as skill',
+      'csu.is_cancelled as isCancelled',
+      'csu.is_present as isPresent'
     )
     .join('users as u', 'u.id', 'csu.user_id')
     .join('skills as s', 's.id', 'csu.skill_id')
@@ -41,7 +43,13 @@ const getStudentsSignedUp = async (classId) => {
 const getVolunteersSignedUp = async (classId) => {
   // get the volunteers signed up for the class
   const listOfVolunteers = await knex('class_sign_ups as csu')
-    .select('u.id', 'u.firstname as firstName', 'u.last_name as lastName')
+    .select(
+      'u.id',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'csu.is_cancelled as isCancelled',
+      'csu.is_present as isPresent'
+    )
     .join('users as u', 'u.id', 'csu.user_id')
     .where('csu.class_id', classId)
     .andWhere('u.role_id', 2)
@@ -65,7 +73,13 @@ const getVolunteersSignedUp = async (classId) => {
 const getClassDetails = async (classId) => {
   // get the data from classes table
   const classDetails = await knex('classes')
-    .select('id', 'date', 'comments', 'call_link as callLink')
+    .select(
+      'id',
+      'date',
+      'comments',
+      'call_link as callLink',
+      'is_submitted as isSubmitted'
+    )
     .where('id', classId)
 
   const skills = await getClassSkills(classId)
@@ -133,9 +147,37 @@ const getStudents = async () => {
   return students
 }
 
+const updateClassAttendance = async (req) => {
+  const { classId } = req.params
+  const attendanceDetails = req.body
+
+  console.log(attendanceDetails)
+
+  let count = 0
+
+  // function to fetch the skills for each volunteer
+  const updateAttendance = async () => {
+    await Promise.all(
+      attendanceDetails.map(async (attendance) => {
+        count += await knex('class_sign_ups as csu')
+          .where('csu.class_id', classId)
+          .andWhere('csu.user_id', attendance.userId)
+          .update({ is_present: attendance.isPresent })
+      })
+    )
+  }
+
+  await updateAttendance()
+
+  await knex('classes').where('id', classId).update({ is_submitted: true })
+
+  return count
+}
+
 export default {
   getClassDetails,
   getUsers,
   getVolunteers,
   getStudents,
+  updateClassAttendance,
 }

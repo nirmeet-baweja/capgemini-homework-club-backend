@@ -1,11 +1,10 @@
 import express from 'express'
 import {
-  // getAdmin,
   getUsers,
   getVolunteers,
   getStudents,
-  // getClasses,
   getClassDetails,
+  updateClassAttendance,
 } from './controllers'
 
 const router = express.Router()
@@ -14,5 +13,6 @@ router.get('/users', getUsers)
 router.get('/volunteers', getVolunteers)
 router.get('/students', getStudents)
 router.get('/class-details/:classId', getClassDetails)
+router.post('/class-details/:classId', updateClassAttendance)
 
 export default router
