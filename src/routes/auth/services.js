@@ -1,8 +1,7 @@
-require('dotenv').config()
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-// const decode = require('jwt-decode')
-const knex = require('../../knex')
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import knex from '../../knex'
+import config from '../../config'
 
 const saltRounds = 10
 const studentRoleId = 3
@@ -48,9 +47,30 @@ const areValidSkills = async (volunteerSkills) => {
 }
 
 const generateAccessToken = (email) =>
-  jwt.sign(email, process.env.TOKEN_SECRET, { expiresIn: '1hr' })
+  jwt.sign(email, config.tokenSecret, { expiresIn: '1hr' })
 
 /* *************************************************************** */
+
+const signIn = async (req) => {
+  const { email, password } = req.body
+  const user = await knex('users')
+    .first('id', 'email', 'password', 'role_id as roleId')
+    .where('email', email)
+    .orderBy('id')
+
+  if (!user) {
+    console.log(`No such user found: ${email}`)
+    throw new Error('Wrong email and/or password.')
+  } else {
+    const validPass = await bcrypt.compare(password, user.password)
+    if (validPass) {
+      const token = generateAccessToken(user)
+      return token
+    }
+    console.log(`Incorrect password for user: ${email}`)
+    throw new Error('Wrong username and/or password.')
+  }
+}
 
 const validateStudentSignUp = async (req) => {
   const { firstName, lastName, password, email, roleId, cohortId } = req.body
@@ -84,8 +104,8 @@ const validateStudentSignUp = async (req) => {
 }
 
 const studentSignUp = async (req) => {
-  // const hash = await bcrypt.hash(req.body.password, saltRounds)
-  const hash = req.body.password
+  const hash = await bcrypt.hash(req.body.password, saltRounds)
+
   const user = {
     firstname: req.body.firstName,
     last_name: req.body.lastName,
@@ -96,10 +116,15 @@ const studentSignUp = async (req) => {
   }
 
   const [userId] = await knex('users').insert(user, 'id')
-  if (user) {
-    const token = generateAccessToken({ user_id: userId })
-    return token
+
+  const [createdUser] = await knex('users')
+    .select('id', 'email', 'password', 'role_id as roleId')
+    .where('id', userId)
+
+  if (createdUser) {
+    return signIn(req)
   }
+
   throw new Error('Please check your details and try again.')
 }
 
@@ -155,39 +180,22 @@ const volunteerSignUp = async (req) => {
     user_id: userId,
     skill_id: skill,
   }))
-
   await knex('user_skills').insert(userSkills)
-  if (user) {
-    const token = generateAccessToken({ user_id: userId })
-    return token
-  }
-  throw new Error('Please check your details and try again.')
-}
 
-const signIn = async (req) => {
-  const { email, password } = req.body
-  const user = await knex('users')
-    .first('*')
-    .where('email', email)
-    .orderBy('id')
-  if (!user) {
-    console.log('No such user found:', req.body.email)
-    throw new Error('Wrong email and/or password.')
-  } else {
-    const validPass = await bcrypt.compare(password, user.password)
-    // const validPass = password === user.password
-    if (validPass) {
-      const token = generateAccessToken({ email })
-      return token
-    }
-    console.log('Incorrect password for user:', email)
-    throw new Error('Wrong username and/or password.')
+  const [createdUser] = await knex('users')
+    .select('id', 'email', 'password', 'role_id as roleId')
+    .where('id', userId)
+
+  if (createdUser) {
+    return signIn(req)
   }
+
+  throw new Error('Please check your details and try again.')
 }
 
 const verifyToken = (req, res) => {
   const token = req.headers.authorization.split(' ')[1]
-  jwt.verify(token, process.env.TOKEN_SECRET, (error, decodedToken) => {
+  jwt.verify(token, config.tokenSecret, (error, decodedToken) => {
     if (error) {
       res.status(401).json({
         message: 'Unauthorized Access!',
