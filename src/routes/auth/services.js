@@ -74,28 +74,27 @@ const validateStudentSignUp = async (req) => {
   const { firstName, lastName, password, email, roleId, cohortId } = req.body
 
   if (!isValidName(firstName) || !isValidName(lastName)) {
-    return { message: 'Enter a valid name. Name cannot be empty' }
+    return { err: 'Enter a valid name. Name cannot be empty' }
   }
 
   if (!isValidEmail(email)) {
-    return { message: 'Enter a valid email address.' }
+    return { err: 'Enter a valid email address.' }
   }
 
   if (!isValidPassword(password)) {
     return {
-      message:
-        'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
+      err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
     }
   }
 
   if (roleId !== studentRoleId) {
-    return { message: 'The given role does not exist. Enter a valid role.' }
+    return { err: 'The given role does not exist. Enter a valid role.' }
   }
 
   const isCohortValid = await isValidCohort(cohortId)
 
   if (!isCohortValid) {
-    return { message: 'The given cohort does not exist. Enter a valid cohort.' }
+    return { err: 'The given cohort does not exist. Enter a valid cohort.' }
   }
 
   return undefined
@@ -131,30 +130,28 @@ const validateVolunteerSignUp = async (req) => {
   const { firstName, lastName, password, email, roleId, skills } = req.body
 
   if (!isValidName(firstName) || !isValidName(lastName)) {
-    return { message: 'Enter a valid name. Name cannot be empty' }
+    return { err: 'Enter a valid name. Name cannot be empty' }
   }
 
   if (!isValidEmail(email)) {
-    return { message: 'Enter a valid email address.' }
+    return { err: 'Enter a valid email address.' }
   }
 
   if (!isValidPassword(password)) {
     return {
-      message:
-        'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
+      err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
     }
   }
 
   if (roleId !== volunteerRoleId) {
-    return { message: 'The given role does not exist. Enter a valid role.' }
+    return { err: 'The given role does not exist. Enter a valid role.' }
   }
 
   const areSkillsValid = await areValidSkills(skills)
 
   if (!areSkillsValid) {
     return {
-      message:
-        'The list of skills contains an invalid value. Check and try again.',
+      err: 'The list of skills contains an invalid value. Check and try again.',
     }
   }
 
