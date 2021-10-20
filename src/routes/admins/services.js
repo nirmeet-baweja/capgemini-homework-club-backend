@@ -1,96 +1,142 @@
 import knex from '../../knex'
 
-const getClasses = async () => {
-  // get the data from classes table
-  const classes = await knex('classes')
+/* ************************************************************************* */
+/* Helper functions */
+
+const getClassSkills = async (classID) => {
+  const classSkills = await knex('class_skills as cs')
+    .select('s.name')
+    .join('skills as s', 's.id', 'cs.skill_id')
+    .where('cs.class_id', classID)
+
+  const skills = classSkills.map((classSkill) => classSkill.name)
+
+  return skills
+}
+
+const getUserSkills = async (userID) => {
+  const userSkills = await knex('user_skills as us')
+    .select('s.name')
+    .join('skills as s', 's.id', 'us.skill_id')
+    .where('us.user_id', userID)
+
+  const skills = userSkills.map((userSkill) => userSkill.name)
+
+  return skills
+}
+
+const getStudentsSignedUp = async (classID) => {
+  // get the students signed up for the class
+  const listOfStudents = await knex('class_sign_ups as csu')
     .select(
-      'id',
-      'date',
-      'comments',
-      'call_link as callLink',
-      'is_submitted as isSubmitted'
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      's.name as skill'
     )
-    .orderBy('date')
+    .join('users as u', 'u.id', 'csu.user_id')
+    .join('skills as s', 's.id', 'csu.skill_id')
+    .where('csu.class_id', classID)
+    .andWhere('u.role_id', 3)
 
-  // function to fetch the skills for each class
-  const fetchSkills = async () => {
+  return listOfStudents
+}
+
+const getVolunteersSignedUp = async (classID) => {
+  // get the volunteers signed up for the class
+  const listOfVolunteers = await knex('class_sign_ups as csu')
+    .select('u.id', 'u.firstname as firstName', 'u.last_name as lastName')
+    .join('users as u', 'u.id', 'csu.user_id')
+    .where('csu.class_id', classID)
+    .andWhere('u.role_id', 2)
+
+  // function to fetch the skills for each volunteer
+  const fetchUserSkills = async () => {
     await Promise.all(
-      classes.map(async (homeworkClass, index) => {
-        const classSkills = await knex('class_skills as cs')
-          .select('s.name')
-          .join('skills as s', 's.id', 'cs.skill_id')
-          .where('cs.class_id', homeworkClass.id)
-
-        const skills = classSkills.map((classSkill) => classSkill.name)
+      listOfVolunteers.map(async (volunteer, index) => {
+        const skills = await getUserSkills(volunteer.id)
         // amend the skills for each class
-        classes[index] = { ...classes[index], skills }
+        listOfVolunteers[index] = { ...listOfVolunteers[index], skills }
       })
     )
   }
+  await fetchUserSkills()
+  return listOfVolunteers
+}
 
-  const fetchNumOfAttendees = async () => {
-    await Promise.all(
-      // get the number of students signed up for the class
-      classes.map(async (homeworkClass, index) => {
-        const numOfStudents = await knex('class_sign_ups as csu')
-          .join('users as u', 'u.id', 'csu.user_id')
-          .where('csu.class_id', homeworkClass.id)
-          .andWhere('u.role_id', 3)
-          .count('u.id')
+/* ************************************************************************* */
 
-        // amend the number of students signed up for each class
-        classes[index] = {
-          ...classes[index],
-          numOfStudents: numOfStudents[0].count,
-        }
+// eslint-disable-next-line arrow-body-style
+const getClassDetails = async (classID) => {
+  // get the data from classes table
+  const classDetails = await knex('classes')
+    .select('id', 'date', 'comments', 'call_link as callLink')
+    .where('id', classID)
 
-        // get the number of volunteers signed up for the class
-        const numOfVolunteers = await knex('class_sign_ups as csu')
-          .join('users as u', 'u.id', 'csu.user_id')
-          .where('csu.class_id', homeworkClass.id)
-          .andWhere('u.role_id', 2)
-          .count('u.id')
+  const skills = await getClassSkills(classID)
+  const listOfStudents = await getStudentsSignedUp(classID)
+  const listOfVolunteers = await getVolunteersSignedUp(classID)
 
-        // amend the number of volunteers signed up for each class
-        classes[index] = {
-          ...classes[index],
-          numOfVolunteers: numOfVolunteers[0].count,
-        }
-      })
-    )
+  return {
+    ...classDetails[0],
+    skills,
+    listOfStudents,
+    listOfVolunteers,
   }
-
-  await fetchSkills()
-  await fetchNumOfAttendees()
-
-  return classes
 }
 
 const getUsers = async () => {
-  const users = await knex('users')
-    .select('firstname', 'last_name', 'email', 'role_id', 'cohort_id')
-    .orderBy('id')
+  const users = await knex('users as u')
+    .select(
+      'u.id',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'r.name as role'
+    )
+    .join('roles as r', 'r.id', 'u.role_id')
+    .orderBy('u.id')
   return users
 }
 
 const getVolunteers = async () => {
   const volunteers = await knex('users')
-    .select('firstname', 'last_name', 'email')
+    .select('id', 'firstname as firstName', 'last_name as lastName', 'email')
     .where('role_id', 2)
     .orderBy('id')
+
+  // function to fetch the skills for each volunteer
+  const fetchUserSkills = async () => {
+    await Promise.all(
+      volunteers.map(async (volunteer, index) => {
+        const skills = await getUserSkills(volunteer.id)
+        // amend the skills for each class
+        volunteers[index] = { ...volunteers[index], skills }
+      })
+    )
+  }
+
+  await fetchUserSkills()
+
   return volunteers
 }
 
 const getStudents = async () => {
-  const students = await knex('users')
-    .select('firstname', 'last_name', 'email', 'cohort_id')
+  const students = await knex('users as u')
+    .select(
+      'u.id',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'c.name as cohort'
+    )
+    .join('cohorts as c', 'c.id', 'u.cohort_id')
     .where('role_id', 3)
-    .orderBy('id')
+    .orderBy('u.id')
   return students
 }
 
 export default {
-  getClasses,
+  getClassDetails,
   getUsers,
   getVolunteers,
   getStudents,
