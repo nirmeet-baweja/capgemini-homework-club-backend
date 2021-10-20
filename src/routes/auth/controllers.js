@@ -8,10 +8,10 @@ export const studentSignUp = async (req, res) => {
       return res.status(400).send(error)
     }
 
-    const result = await services.studentSignUp(req) // store into database
-    return res.status(200).send(result)
+    const token = await services.studentSignUp(req) // store into database
+    return res.status(200).send({ token })
   } catch (err) {
-    return res.status(400).send('something went wrong')
+    return res.status(400).send({ err })
   }
 }
 
@@ -23,11 +23,11 @@ export const volunteerSignUp = async (req, res) => {
       return res.status(400).send(error)
     }
 
-    const result = await services.volunteerSignUp(req) // store into database
-    return res.status(200).send(result)
+    const token = await services.volunteerSignUp(req) // store into database
+    return res.status(200).send({ token })
     // return res.status(200).send('no error')
   } catch (err) {
-    return res.status(400).send('something went wrong')
+    return res.status(400).send({ err })
   }
 }
 
