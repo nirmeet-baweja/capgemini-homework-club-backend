@@ -20,7 +20,7 @@ module.exports = {
   development: {
     client: 'postgresql',
     connection: {
-      connectionString: process.env.DATABASE_URL,
+      connectionString: process.env.API_URL,
       connectionTimeoutMillis: 5000,
       ssl: {
         rejectUnauthorized: false,
