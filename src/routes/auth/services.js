@@ -46,8 +46,8 @@ const areValidSkills = async (volunteerSkills) => {
   return everyElement
 }
 
-const generateAccessToken = (email) =>
-  jwt.sign(email, config.tokenSecret, { expiresIn: '1hr' })
+const generateAccessToken = (userDetails) =>
+  jwt.sign(userDetails, config.tokenSecret, { expiresIn: '1hr' })
 
 /* *************************************************************** */
 
@@ -60,15 +60,14 @@ const signIn = async (req) => {
     .orderBy('u.id')
 
   if (!user) {
-    return new Error('Wrong email and/or password.')
+    return { err: 'Wrong email and/or password.' }
   }
   const validPass = await bcrypt.compare(password, user.password)
   if (validPass) {
     const { userId, role } = user
-    const token = generateAccessToken({ userId, email, role })
-    return token
+    return { token: generateAccessToken({ userId, email, role }) }
   }
-  return new Error('Wrong username and/or password.')
+  return { err: 'Wrong email and/or password.' }
 }
 
 const validateStudentSignUp = async (req) => {
@@ -123,9 +122,9 @@ const studentSignUp = async (req) => {
 
   // login the user after sign-up is complete
   if (createdUser) {
-    return generateAccessToken(createdUser)
+    return { token: generateAccessToken(createdUser) }
   }
-  return new Error('Please check your details and try again.')
+  return { err: 'Please check your details and try again.' }
 }
 
 const validateVolunteerSignUp = async (req) => {
@@ -190,9 +189,9 @@ const volunteerSignUp = async (req) => {
 
   // login the user after sign-up is complete
   if (createdUser) {
-    return generateAccessToken(createdUser)
+    return { token: generateAccessToken(createdUser) }
   }
-  return new Error('Please check your details and try again.')
+  return { err: 'Please check your details and try again.' }
 }
 
 export default {

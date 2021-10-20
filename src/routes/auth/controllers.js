@@ -8,8 +8,8 @@ export const studentSignUp = async (req, res) => {
       return res.status(400).send(error)
     }
 
-    const token = await services.studentSignUp(req) // store into database
-    return res.status(200).send({ token })
+    const result = await services.studentSignUp(req) // store into database
+    return res.status(200).send(result)
   } catch (err) {
     return res.status(400).send({ err })
   }
@@ -23,8 +23,8 @@ export const volunteerSignUp = async (req, res) => {
       return res.status(400).send(error)
     }
 
-    const token = await services.volunteerSignUp(req) // store into database
-    return res.status(200).send({ token })
+    const result = await services.volunteerSignUp(req) // store into database
+    return res.status(200).send(result)
     // return res.status(200).send('no error')
   } catch (err) {
     return res.status(400).send({ err })
@@ -33,8 +33,8 @@ export const volunteerSignUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
   try {
-    const token = await services.signIn(req) // store into database
-    return res.status(200).send({ token })
+    const result = await services.signIn(req) // store into database
+    return res.status(200).send(result)
   } catch (err) {
     console.log(err)
     return res.status(401).send({ err: 'Wrong email and/or password.' })
