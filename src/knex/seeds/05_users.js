@@ -462,17 +462,10 @@ exports.seed = async function (knex) {
       userList.map(async (user, index) => {
         const hash = await bcrypt.hash(user.password, saltRounds)
         userList[index].password = hash
-        console.log(user.password)
       })
     )
   }
   await setHashedPassword()
-
-  // userList.forEach(async (user, index) => {
-  //   const hash = await bcrypt.hash(user.password, saltRounds)
-  //   userList[index].password = hash
-  //   console.log(user.password)
-  // })
 
   // Deletes ALL existing entries
   return knex('users')
