@@ -1,9 +1,9 @@
 import express from 'express'
 import cors from 'cors'
-// import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { authHelper } from './utils'
 import config from './config'
+
 // import new routes from routes
 import { admins, auth, common, students, volunteers } from './routes'
 

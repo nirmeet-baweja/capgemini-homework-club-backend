@@ -52,7 +52,6 @@ const generateAccessToken = (email) =>
 /* *************************************************************** */
 
 const signIn = async (req) => {
-  console.log('sign in ')
   const { email, password } = req.body
   const [user] = await knex('users as u')
     .join('roles as r', 'r.id', 'u.role_id')
@@ -60,23 +59,16 @@ const signIn = async (req) => {
     .where('u.email', email)
     .orderBy('u.id')
 
-  console.log(user)
-
   if (!user) {
-    console.log(`No such user found: ${email}`)
-    throw new Error('Wrong email and/or password.')
-  } else {
-    const validPass = await bcrypt.compare(password, user.password)
-    if (validPass) {
-      // remove password from token
-      // send the roles, email, id
-      const { userId, role } = user
-      const token = generateAccessToken({ userId, email, role })
-      return token
-    }
-    console.log(`Incorrect password for user: ${email}`)
-    throw new Error('Wrong username and/or password.')
+    return new Error('Wrong email and/or password.')
   }
+  const validPass = await bcrypt.compare(password, user.password)
+  if (validPass) {
+    const { userId, role } = user
+    const token = generateAccessToken({ userId, email, role })
+    return token
+  }
+  return new Error('Wrong username and/or password.')
 }
 
 const validateStudentSignUp = async (req) => {
@@ -124,17 +116,16 @@ const studentSignUp = async (req) => {
 
   const [userId] = await knex('users').insert(user, 'id')
 
-  const [createdUser] = await knex('users')
+  const [createdUser] = await knex('users as u')
     .select('u.id as userId', 'u.email', 'r.name as role')
     .join('roles as r', 'r.id', 'u.role_id')
-    .where('id', userId)
+    .where('u.id', userId)
 
-  // do the same for volunteer
+  // login the user after sign-up is complete
   if (createdUser) {
     return generateAccessToken(createdUser)
   }
-
-  throw new Error('Please check your details and try again.')
+  return new Error('Please check your details and try again.')
 }
 
 const validateVolunteerSignUp = async (req) => {
@@ -183,6 +174,7 @@ const volunteerSignUp = async (req) => {
     role_id: req.body.roleId,
     cohort_id: null,
   }
+
   const [userId] = await knex('users').insert(user, 'id')
 
   const userSkills = skills.map((skill) => ({
@@ -191,31 +183,16 @@ const volunteerSignUp = async (req) => {
   }))
   await knex('user_skills').insert(userSkills)
 
-  const [createdUser] = await knex('users')
-    .select('id', 'email', 'password', 'role_id as roleId')
-    .where('id', userId)
+  const [createdUser] = await knex('users as u')
+    .select('u.id as userId', 'u.email', 'r.name as role')
+    .join('roles as r', 'r.id', 'u.role_id')
+    .where('u.id', userId)
 
+  // login the user after sign-up is complete
   if (createdUser) {
-    return signIn(req)
+    return generateAccessToken(createdUser)
   }
-
-  throw new Error('Please check your details and try again.')
-}
-
-const verifyToken = (req, res) => {
-  const token = req.headers.authorization.split(' ')[1]
-  jwt.verify(token, config.tokenSecret, (error, decodedToken) => {
-    if (error) {
-      res.status(401).json({
-        message: 'Unauthorized Access!',
-      })
-    } else {
-      res.status(200).json({
-        email: decodedToken.email,
-        password: decodedToken.password,
-      })
-    }
-  })
+  return new Error('Please check your details and try again.')
 }
 
 export default {
@@ -224,5 +201,4 @@ export default {
   validateVolunteerSignUp,
   volunteerSignUp,
   signIn,
-  verifyToken,
 }
