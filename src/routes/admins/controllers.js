@@ -37,6 +37,15 @@ export const getStudents = async (req, res) => {
   }
 }
 
+export const getAttendance = async (req, res) => {
+  try {
+    const attendance = await services.getAttendance()
+    return res.json(attendance)
+  } catch (err) {
+    return res.status(404).send('Attendance not found.')
+  }
+}
+
 export const updateClassAttendance = async (req, res) => {
   try {
     // const { classId } = req.params

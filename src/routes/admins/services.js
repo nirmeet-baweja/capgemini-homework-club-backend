@@ -1,5 +1,8 @@
 import knex from '../../knex'
 
+const volunteerRoleId = 2
+const studentRoleId = 3
+
 /* ************************************************************************* */
 /* Helper functions */
 
@@ -147,11 +150,67 @@ const getStudents = async () => {
   return students
 }
 
+const getAttendance = async () => {
+  const attendance = []
+
+  const totalSignUps = await knex('class_sign_ups as csu')
+    .join('classes as c', 'c.id', 'csu.class_id')
+    .select('class_id as classId', 'c.date')
+    .count('class_id as totalSignUps')
+    .groupBy('class_id', 'c.date')
+    .orderBy('class_id')
+
+  const studentSignUps = await knex('class_sign_ups as csu')
+    .join('users as u', 'u.id', 'csu.user_id')
+    .select('class_id as classId')
+    .count('class_id as studentSignUps')
+    .where('u.role_id', studentRoleId)
+    .groupBy('class_id')
+    .orderBy('class_id')
+
+  const volunteerSignUps = await knex('class_sign_ups as csu')
+    .join('users as u', 'u.id', 'csu.user_id')
+    .select('class_id as classId')
+    .count('class_id as volunteerSignUps')
+    .where('u.role_id', volunteerRoleId)
+    .groupBy('class_id')
+    .orderBy('class_id')
+
+  const studentsPresent = await knex('class_sign_ups as csu')
+    .join('users as u', 'u.id', 'csu.user_id')
+    .select('class_id as classId')
+    .count('class_id as studentsPresent')
+    .where('u.role_id', studentRoleId)
+    .andWhere('is_present', true)
+    .groupBy('class_id')
+    .orderBy('class_id')
+
+  const volunteersPresent = await knex('class_sign_ups as csu')
+    .join('users as u', 'u.id', 'csu.user_id')
+    .select('class_id as classId')
+    .count('class_id as volunteersPresent')
+    .where('u.role_id', volunteerRoleId)
+    .andWhere('is_present', true)
+    .groupBy('class_id')
+    .orderBy('class_id')
+
+  totalSignUps.forEach((signUp, index) => {
+    attendance.push({
+      ...totalSignUps[index],
+      ...studentSignUps[index],
+      ...volunteerSignUps[index],
+      ...studentsPresent[index],
+      ...volunteersPresent[index],
+    })
+  })
+
+  // console.log(attendance)
+  return attendance
+}
+
 const updateClassAttendance = async (req) => {
   const { classId } = req.params
   const attendanceDetails = req.body
-
-  console.log(attendanceDetails)
 
   let count = 0
 
@@ -159,7 +218,8 @@ const updateClassAttendance = async (req) => {
   const updateAttendance = async () => {
     await Promise.all(
       attendanceDetails.map(async (attendance) => {
-        count += await knex('class_sign_ups as csu')
+        count += 1
+        await knex('class_sign_ups as csu')
           .where('csu.class_id', classId)
           .andWhere('csu.user_id', attendance.userId)
           .update({ is_present: attendance.isPresent })
@@ -179,5 +239,6 @@ export default {
   getUsers,
   getVolunteers,
   getStudents,
+  getAttendance,
   updateClassAttendance,
 }
