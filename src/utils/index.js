@@ -26,6 +26,9 @@ export async function authHelper(req, res, next) {
       .select('u.id as userId', 'u.email', 'r.name as role')
       .where('u.id', tokenUser.userId)
 
+    // is this allowed?
+    req.body.userId = tokenUser.userId
+
     if (!checkUserAccess(user.role, req.url)) {
       res.sendStatus(401)
     }
