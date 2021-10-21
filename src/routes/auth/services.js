@@ -55,7 +55,14 @@ const signIn = async (req) => {
   const { email, password } = req.body
   const [user] = await knex('users as u')
     .join('roles as r', 'r.id', 'u.role_id')
-    .select('u.id as userId', 'u.email', 'u.password', 'r.name as role')
+    .select(
+      'u.id as userId',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'u.password',
+      'r.name as role'
+    )
     .where('u.email', email)
     .orderBy('u.id')
 
@@ -64,8 +71,10 @@ const signIn = async (req) => {
   }
   const validPass = await bcrypt.compare(password, user.password)
   if (validPass) {
-    const { userId, role } = user
-    return { token: generateAccessToken({ userId, email, role }) }
+    const { userId, firstName, lastName, role } = user
+    return {
+      token: generateAccessToken({ userId, firstName, lastName, email, role }),
+    }
   }
   return { err: 'Wrong email and/or password.' }
 }
@@ -115,7 +124,13 @@ const studentSignUp = async (req) => {
   const [userId] = await knex('users').insert(user, 'id')
 
   const [createdUser] = await knex('users as u')
-    .select('u.id as userId', 'u.email', 'r.name as role')
+    .select(
+      'u.id as userId',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'r.name as role'
+    )
     .join('roles as r', 'r.id', 'u.role_id')
     .where('u.id', userId)
 
@@ -180,7 +195,13 @@ const volunteerSignUp = async (req) => {
   await knex('user_skills').insert(userSkills)
 
   const [createdUser] = await knex('users as u')
-    .select('u.id as userId', 'u.email', 'r.name as role')
+    .select(
+      'u.id as userId',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'r.name as role'
+    )
     .join('roles as r', 'r.id', 'u.role_id')
     .where('u.id', userId)
 
