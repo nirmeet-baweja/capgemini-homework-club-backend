@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt'
 import knex from '../../knex'
 import config from '../../config'
 
+const sgMail = require('@sendgrid/mail')
+
 const saltRounds = 10
 const studentRoleId = 3
 const volunteerRoleId = 2
@@ -49,6 +51,37 @@ const areValidSkills = async (volunteerSkills) => {
 const generateAccessToken = (userDetails) =>
   jwt.sign(userDetails, config.tokenSecret, { expiresIn: '1hr' })
 
+function filterBy(filter) {
+  return knex('users').where(filter)
+}
+
+// same here, looking into 'users' table by 'id' and then updating the values
+function update(id, changes) {
+  return knex('users').where({ id }).update(changes)
+}
+function sendEmail(user, token) {
+  sgMail.setApiKey(config.sendGridKey)
+  const msg = {
+    to: user.email,
+    from: '', // your email
+    subject: 'Reset password requested',
+    html: `
+       <a href="${process.env.clientURL}/reset-password/${token}">${token}</a>
+     `,
+    // I'm only going to use an (a tag) to make this easier to
+    // understand but feel free to add any email templates
+    // in the `html` property
+  }
+
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log('Email sent')
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 /* *************************************************************** */
 
 const signIn = async (req) => {
@@ -191,10 +224,81 @@ const volunteerSignUp = async (req) => {
   return { err: 'Please check your details and try again.' }
 }
 
+// forgot password
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body
+
+  try {
+    // look for email in database
+    const [user] = await filterBy({ email })
+    // if there is no user send back an error
+    if (!user) {
+      res.status(404).json({ error: 'Invalid email' })
+    } else {
+      // otherwise we need to create a temporary token that expires in 10 mins
+      const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
+        expiresIn: '10m',
+      })
+      // update resetLink property to be the temporary token and then send email
+      await update(user.id, { resetLink })
+      // we'll define this function below
+      sendEmail(user, resetLink)
+      res.status(200).json({ message: 'Check your email' })
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+// password token
+const resetPassword = async (req, res) => {
+  // Get the token from params
+  const resetLink = req.params.token
+  const newPassword = req.body
+
+  // if there is a token we need to decoded and check for no errors
+  if (resetLink) {
+    jwt.verify(resetLink, process.env.resetPasswordKey, (error) => {
+      if (error) {
+        res.status().json({ message: 'Incorrect token or expired' })
+      }
+    })
+  }
+
+  try {
+    // find user by the temporary token we stored earlier
+    const [user] = await filterBy({ resetLink })
+
+    // if there is no user, send back an error
+    if (!user) {
+      res
+        .status(400)
+        .json({ message: 'We could not find a match for this link' })
+    }
+
+    // otherwise we need to hash the new password  before saving it in the database
+    const hashPassword = bcrypt.hash(newPassword.password, saltRounds)
+    newPassword.password = hashPassword
+
+    // update user credentials and remove the temporary link from database before saving
+    const updatedCredentials = {
+      password: newPassword.password,
+      resetLink: null,
+    }
+
+    await update(user.id, updatedCredentials)
+    res.status(200).json({ message: 'Password updated' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 export default {
   validateStudentSignUp,
   studentSignUp,
   validateVolunteerSignUp,
   volunteerSignUp,
   signIn,
+  forgotPassword,
+  resetPassword,
 }

@@ -40,3 +40,22 @@ export const signIn = async (req, res) => {
     return res.status(401).send({ err: 'Wrong email and/or password.' })
   }
 }
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const result = await services.forgotPassword(req) // store into database
+    return res.status(200).send(result)
+  } catch (err) {
+    console.log(err)
+    return res.status(401).send({ err: 'Wrong credentials.' })
+  }
+}
+export const resetPassword = async (req, res) => {
+  try {
+    const result = await services.resetPassword(req) // store into database
+    return res.status(200).send(result)
+  } catch (err) {
+    console.log(err)
+    return res.status(401).send({ err: 'Wrong credentials.' })
+  }
+}
