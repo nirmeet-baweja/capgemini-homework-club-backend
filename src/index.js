@@ -1,8 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
-// eslint-disable-next-line no-unused-vars
-import { authHelper, authenticateJWT } from './utils'
+import { authenticateJWT } from './utils'
 import config from './config'
 
 // import new routes from routes
