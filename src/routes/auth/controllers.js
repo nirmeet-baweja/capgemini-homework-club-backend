@@ -27,7 +27,7 @@ export const volunteerSignUp = async (req, res) => {
     return res.status(200).send(result)
     // return res.status(200).send('no error')
   } catch (err) {
-    return res.status(400).send(err.message)
+    return res.status(400).send({ err })
   }
 }
 
@@ -35,11 +35,10 @@ export const signIn = async (req, res) => {
   try {
     const result = await services.signIn(req) // store into database
     if (result.err) {
-      res.status(401).send(result.err)
+      res.status(401).send(result)
     }
     return res.status(200).send(result)
   } catch (err) {
-    console.log(err)
-    return res.status(401).send('Wrong email and/or password.')
+    return res.status(401).send({ err: 'Wrong email and/or password.' })
   }
 }
