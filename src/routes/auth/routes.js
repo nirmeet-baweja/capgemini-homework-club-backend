@@ -1,10 +1,10 @@
 import express from 'express'
-import { studentSignUp } from './controllers'
+import { studentSignUp, volunteerSignUp, signIn } from './controllers'
 
 const router = express.Router()
 // localhost:3001/auth
 router.post('/student/sign-up', studentSignUp)
-// router.get("/volunteer/sign-up", );
-// router.get("/sign-in", );
+router.post('/volunteer/sign-up', volunteerSignUp)
+router.post('/sign-in', signIn)
 
 export default router
