@@ -3,7 +3,6 @@ import services from './services'
 export const studentSignUp = async (req, res) => {
   try {
     const error = await services.validateStudentSignUp(req)
-
     if (error) {
       return res.status(400).send(error)
     }
@@ -35,7 +34,7 @@ export const signIn = async (req, res) => {
   try {
     const result = await services.signIn(req) // store into database
     if (result.err) {
-      res.status(401).send(result)
+      return res.status(401).send(result)
     }
     return res.status(200).send(result)
   } catch (err) {
