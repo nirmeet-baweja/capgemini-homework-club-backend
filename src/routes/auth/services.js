@@ -263,11 +263,11 @@ const resetPassword = async (req, res) => {
   if (resetLink) {
     jwt.verify(resetLink, config.tokenSecret, (error) => {
       if (error) {
-        return res.status(500).json({ message: 'Incorrect token or expired' })
+        res.status(500).json({ message: 'Incorrect token or expired' })
       }
-      return res.status(200)
     })
-  } else return res.status(200)
+    return res.status(404).json({ message: 'Something went wrong!' })
+  }
 
   try {
     // find user by the temporary token we stored earlier
