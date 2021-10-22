@@ -33,9 +33,8 @@ export async function authHelper(req, res, next) {
       if (!checkUserAccess(user.role, req.url)) {
         res.sendStatus(401)
       }
-      next()
     }
-    res.sendStatus(401)
+    next()
   } catch (err) {
     res.sendStatus(401)
   }
