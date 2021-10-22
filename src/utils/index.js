@@ -31,11 +31,36 @@ export async function authHelper(req, res, next) {
       req.lookUpUser = user
 
       if (!checkUserAccess(user.role, req.url)) {
-        return res.sendStatus(401)
+        res.sendStatus(401)
       }
+      next()
     }
-    return next()
+    res.sendStatus(401)
   } catch (err) {
-    return res.sendStatus(401)
+    res.sendStatus(401)
+  }
+}
+
+export const authenticateJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization
+
+  if (authHeader) {
+    const token = authHeader.split(' ')[1]
+
+    // eslint-disable-next-line consistent-return
+    jwt.verify(token, config.tokenSecret, (err, user) => {
+      if (err) {
+        return res.sendStatus(403)
+      }
+
+      if (!checkUserAccess(user.role, req.url)) {
+        return res.sendStatus(403)
+      }
+
+      req.user = user
+      next()
+    })
+  } else {
+    res.sendStatus(401)
   }
 }

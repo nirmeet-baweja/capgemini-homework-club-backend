@@ -1,7 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
-import { authHelper } from './utils'
+// eslint-disable-next-line no-unused-vars
+import { authHelper, authenticateJWT } from './utils'
 import config from './config'
 
 // import new routes from routes
@@ -13,15 +14,16 @@ const startServer = () => {
   const app = express()
     .use(cors())
     .use(express.json({ limit: '50mb', parameterLimit: 50000 }))
+    .get('/', (reg, res) => res.status(200).send('Server is up and running!'))
     .use('/auth', auth)
-    .get('/health', (reg, res) => res.sendStatus(200))
-    .use(authHelper)
+    .use('/data', common)
+    .use(authenticateJWT)
     // localhost:3001
     .use('/admins', admins)
     .use('/students', students)
     .use('/volunteers', volunteers)
-    .use('/data', common)
     .listen(config.port || 3001, () =>
+      // eslint-disable-next-line no-console
       console.log(`Listening on ${server.address().port}`)
     )
   return app
