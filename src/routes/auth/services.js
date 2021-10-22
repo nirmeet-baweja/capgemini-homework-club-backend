@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import knex from '../../knex'
 import config from '../../config'
 
-const saltRounds = 10
+const saltRounds = 2
 const studentRoleId = 3
 const volunteerRoleId = 2
 
