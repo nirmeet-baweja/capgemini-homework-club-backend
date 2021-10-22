@@ -1,15 +1,5 @@
 import services from './services'
 
-export const getClassDetails = async (req, res) => {
-  try {
-    const { classId } = req.params
-    const classDetails = await services.getClassDetails(classId)
-    return res.json(classDetails)
-  } catch (err) {
-    return res.status(404).send('Class not found.')
-  }
-}
-
 export const getUsers = async (req, res) => {
   try {
     const users = await services.getUsers()
@@ -37,21 +27,39 @@ export const getStudents = async (req, res) => {
   }
 }
 
+export const createNewClass = async (req, res) => {
+  try {
+    await services.createNewClass(req)
+    return res.sendStatus(201)
+  } catch (err) {
+    return res.status(404).send('Failed to create class.')
+  }
+}
+
+export const getClassDetails = async (req, res) => {
+  try {
+    const { classId } = req.params
+    const classDetails = await services.getClassDetails(classId)
+    return res.json(classDetails)
+  } catch (err) {
+    return res.status(404).send('Class not found.')
+  }
+}
+
+export const updateClassAttendance = async (req, res) => {
+  try {
+    await services.updateClassAttendance(req)
+    return res.sendStatus(201)
+  } catch (err) {
+    return res.status(404).send('Class not found.')
+  }
+}
+
 export const getAttendance = async (req, res) => {
   try {
     const attendance = await services.getAttendance()
     return res.json(attendance)
   } catch (err) {
     return res.status(404).send('Attendance not found.')
-  }
-}
-
-export const updateClassAttendance = async (req, res) => {
-  try {
-    // const { classId } = req.params
-    const classDetails = await services.updateClassAttendance(req)
-    return res.json(classDetails)
-  } catch (err) {
-    return res.status(404).send('Class not found.')
   }
 }

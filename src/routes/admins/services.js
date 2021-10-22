@@ -73,32 +73,6 @@ const getVolunteersSignedUp = async (classId) => {
 
 /* ************************************************************************* */
 
-const getClassDetails = async (classId) => {
-  // get the data from classes table
-  const classDetails = await knex('classes')
-    .select(
-      'id',
-      'date',
-      'comments',
-      'call_link as callLink',
-      'is_submitted as isSubmitted'
-    )
-    .where('id', classId)
-
-  const skills = await getClassSkills(classId)
-  const listOfStudents = await getStudentsSignedUp(classId)
-  const listOfVolunteers = await getVolunteersSignedUp(classId)
-
-  return {
-    ...classDetails[0],
-    numOfStudents: listOfStudents.length,
-    numOfVolunteers: listOfVolunteers.length,
-    skills,
-    listOfStudents,
-    listOfVolunteers,
-  }
-}
-
 const getUsers = async () => {
   const users = await knex('users as u')
     .select(
@@ -148,6 +122,41 @@ const getStudents = async () => {
     .where('role_id', 3)
     .orderBy('u.id')
   return students
+}
+
+// const createNewClass = async (req) => {
+//   const newClass = {
+//     date: '10/10/2021',
+//     comments: 'some text goes here',
+//     call_link: 'http://somelink',
+//     skills: [1, 3, 6],
+//   }
+// }
+
+const getClassDetails = async (classId) => {
+  // get the data from classes table
+  const classDetails = await knex('classes')
+    .select(
+      'id',
+      'date',
+      'comments',
+      'call_link as callLink',
+      'is_submitted as isSubmitted'
+    )
+    .where('id', classId)
+
+  const skills = await getClassSkills(classId)
+  const listOfStudents = await getStudentsSignedUp(classId)
+  const listOfVolunteers = await getVolunteersSignedUp(classId)
+
+  return {
+    ...classDetails[0],
+    numOfStudents: listOfStudents.length,
+    numOfVolunteers: listOfVolunteers.length,
+    skills,
+    listOfStudents,
+    listOfVolunteers,
+  }
 }
 
 const getAttendance = async () => {
@@ -212,13 +221,10 @@ const updateClassAttendance = async (req) => {
   const { classId } = req.params
   const attendanceDetails = req.body
 
-  let count = 0
-
   // function to fetch the skills for each volunteer
   const updateAttendance = async () => {
     await Promise.all(
       attendanceDetails.map(async (attendance) => {
-        count += 1
         await knex('class_sign_ups as csu')
           .where('csu.class_id', classId)
           .andWhere('csu.user_id', attendance.userId)
@@ -230,8 +236,6 @@ const updateClassAttendance = async (req) => {
   await updateAttendance()
 
   await knex('classes').where('id', classId).update({ is_submitted: true })
-
-  return count
 }
 
 export default {
