@@ -31,11 +31,11 @@ export async function authHelper(req, res, next) {
       req.lookUpUser = user
 
       if (!checkUserAccess(user.role, req.url)) {
-        res.sendStatus(401)
+        return res.sendStatus(401)
       }
     }
-    next()
+    return next()
   } catch (err) {
-    res.sendStatus(401)
+    return res.sendStatus(401)
   }
 }
