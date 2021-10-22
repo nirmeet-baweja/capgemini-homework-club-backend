@@ -61,6 +61,8 @@ function update(id, changes) {
 }
 function sendEmail(user, token) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+  console.log(token)
+  console.log(`${process.env.clientURL}/reset-password/${token}`)
   const msg = {
     to: user.email,
     from: 'debby21@mail.com', // your email
@@ -93,12 +95,13 @@ const signIn = async (req) => {
   if (!user) {
     return { err: 'Wrong email and/or password.' }
   }
+  console.log(password, user.password)
   const validPass = await bcrypt.compare(password, user.password)
   if (validPass) {
     const { userId, role } = user
     return { token: generateAccessToken({ userId, email, role }) }
   }
-  return { err: 'Wrong email and/or password.' }
+  return { err: 'Wrong user.' }
 }
 
 const validateStudentSignUp = async (req) => {
@@ -238,8 +241,6 @@ const forgotPassword = async (req, res) => {
       const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
         expiresIn: '10m',
       })
-      console.log(resetLink)
-      console.log(user.id)
       // update resetLink property to be the temporary token and then send email
       await update(user.id, { resetLink })
       console.log(res)
@@ -258,14 +259,15 @@ const resetPassword = async (req, res) => {
   const resetLink = req.params.token
   const newPassword = req.body
 
-  // if there is a token we need to decoded and check for no errors
+  // if there is a token we need to decode and check for no errors
   if (resetLink) {
-    jwt.verify(resetLink, process.env.resetPasswordKey, (error) => {
+    jwt.verify(resetLink, config.tokenSecret, (error) => {
       if (error) {
-        res.status().json({ message: 'Incorrect token or expired' })
+        return res.status(500).json({ message: 'Incorrect token or expired' })
       }
+      return res.status(200)
     })
-  }
+  } else return res.status(200)
 
   try {
     // find user by the temporary token we stored earlier
@@ -273,25 +275,26 @@ const resetPassword = async (req, res) => {
 
     // if there is no user, send back an error
     if (!user) {
-      res
+      return res
         .status(400)
         .json({ message: 'We could not find a match for this link' })
     }
 
     // otherwise we need to hash the new password  before saving it in the database
-    const hashPassword = bcrypt.hash(newPassword.password, saltRounds)
+    const hashPassword = await bcrypt.hash(newPassword.password, saltRounds)
     newPassword.password = hashPassword
 
     // update user credentials and remove the temporary link from database before saving
     const updatedCredentials = {
-      password: newPassword.password,
+      password: hashPassword,
       resetLink: null,
     }
 
     await update(user.id, updatedCredentials)
-    res.status(200).json({ message: 'Password updated' })
+
+    return res.status(200).json({ message: 'Password updated' })
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    return res.status(500).json({ message: error.message })
   }
 }
 
