@@ -60,17 +60,14 @@ function update(id, changes) {
   return knex('users').where({ id }).update(changes)
 }
 function sendEmail(user, token) {
-  sgMail.setApiKey(config.sendGridKey)
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
   const msg = {
     to: user.email,
-    from: '', // your email
+    from: 'debby21@mail.com', // your email
     subject: 'Reset password requested',
     html: `
        <a href="${process.env.clientURL}/reset-password/${token}">${token}</a>
      `,
-    // I'm only going to use an (a tag) to make this easier to
-    // understand but feel free to add any email templates
-    // in the `html` property
   }
 
   sgMail
@@ -79,7 +76,8 @@ function sendEmail(user, token) {
       console.log('Email sent')
     })
     .catch((error) => {
-      console.error(error)
+      // Log friendly error
+      console.error(error.toString())
     })
 }
 /* *************************************************************** */
@@ -240,10 +238,14 @@ const forgotPassword = async (req, res) => {
       const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
         expiresIn: '10m',
       })
+      console.log(resetLink)
+      console.log(user.id)
       // update resetLink property to be the temporary token and then send email
       await update(user.id, { resetLink })
+      console.log(res)
       // we'll define this function below
       sendEmail(user, resetLink)
+
       res.status(200).json({ message: 'Check your email' })
     }
   } catch (error) {

@@ -43,7 +43,7 @@ export const signIn = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   try {
-    const result = await services.forgotPassword(req) // store into database
+    const result = await services.forgotPassword(req, res) // store into database
     return res.status(200).send(result)
   } catch (err) {
     console.log(err)
@@ -52,7 +52,7 @@ export const forgotPassword = async (req, res) => {
 }
 export const resetPassword = async (req, res) => {
   try {
-    const result = await services.resetPassword(req) // store into database
+    const result = await services.resetPassword(req, res) // store into database
     return res.status(200).send(result)
   } catch (err) {
     console.log(err)
