@@ -1,0 +1,16 @@
+[
+  {
+    "role": "Volunteer",
+    "paths": [
+      "/data",
+      "/volunteers"
+    ]
+  },
+  {
+    "role": "Student",
+    "paths": [
+      "/data",
+      "/students"
+    ]
+  }
+]

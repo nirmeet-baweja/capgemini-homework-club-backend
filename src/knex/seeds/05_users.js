@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 
-const saltRounds = 10
+const saltRounds = 2
 
 exports.seed = async function (knex) {
   const userList = [
