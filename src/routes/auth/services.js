@@ -80,7 +80,7 @@ const signIn = async (req) => {
 }
 
 const validateStudentSignUp = async (req) => {
-  const { firstName, lastName, password, email, roleId, cohortId } = req.body
+  const { firstName, lastName, password, email, cohortId } = req.body
 
   if (!isValidName(firstName) || !isValidName(lastName)) {
     return { err: 'Enter a valid name. Name cannot be empty' }
@@ -94,10 +94,6 @@ const validateStudentSignUp = async (req) => {
     return {
       err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
     }
-  }
-
-  if (roleId !== studentRoleId) {
-    return { err: 'The given role does not exist. Enter a valid role.' }
   }
 
   const isCohortValid = await isValidCohort(cohortId)
@@ -117,7 +113,7 @@ const studentSignUp = async (req) => {
     last_name: req.body.lastName,
     email: req.body.email,
     password: hash,
-    role_id: req.body.roleId,
+    role_id: studentRoleId,
     cohort_id: req.body.cohortId,
   }
 
@@ -142,7 +138,7 @@ const studentSignUp = async (req) => {
 }
 
 const validateVolunteerSignUp = async (req) => {
-  const { firstName, lastName, password, email, roleId, skills } = req.body
+  const { firstName, lastName, password, email, skills } = req.body
 
   if (!isValidName(firstName) || !isValidName(lastName)) {
     return { err: 'Enter a valid name. Name cannot be empty' }
@@ -156,10 +152,6 @@ const validateVolunteerSignUp = async (req) => {
     return {
       err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
     }
-  }
-
-  if (roleId !== volunteerRoleId) {
-    return { err: 'The given role does not exist. Enter a valid role.' }
   }
 
   const areSkillsValid = await areValidSkills(skills)
@@ -182,7 +174,7 @@ const volunteerSignUp = async (req) => {
     last_name: req.body.lastName,
     email: req.body.email,
     password: hash,
-    role_id: req.body.roleId,
+    role_id: volunteerRoleId,
     cohort_id: null,
   }
 
