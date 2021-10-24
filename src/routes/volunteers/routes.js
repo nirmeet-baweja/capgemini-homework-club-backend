@@ -1,8 +1,9 @@
 import express from 'express'
-import { getVolunteer } from './controllers'
+import { getSignedUpClasses } from './controllers'
 
 const router = express.Router()
-// localhost:3001/volunteers
-router.get('/:userId', getVolunteer)
+
+// localhost:3001/students
+router.get('/class-sign-ups', getSignedUpClasses)
 
 export default router

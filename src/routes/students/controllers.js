@@ -1,9 +1,13 @@
-export const getStudent = async (req, res) => {
-  // const { userId } = req.params
+import services from './services'
+
+export const getSignedUpClasses = async (req, res) => {
   try {
-    return res.status(200).send({ students: 'student data' })
+    const result = await services.getSignedUpClasses(req) // store into database
+    if (result.err) {
+      return res.status(404).send(result.err)
+    }
+    return res.json(result.classes)
   } catch (err) {
-    console.log(err)
-    return res.status(400).send('Student not found')
+    return res.status(401).send('Classes not found.')
   }
 }
