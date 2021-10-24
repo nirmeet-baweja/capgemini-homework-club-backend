@@ -29,10 +29,13 @@ export const getStudents = async (req, res) => {
 
 export const createNewClass = async (req, res) => {
   try {
-    await services.createNewClass(req)
-    return res.sendStatus(201)
+    const result = await services.createNewClass(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res.status(201).send(result)
   } catch (err) {
-    return res.status(404).send('Failed to create class.')
+    return res.status(400).send('Failed to create class.')
   }
 }
 
@@ -51,7 +54,7 @@ export const updateClassAttendance = async (req, res) => {
     await services.updateClassAttendance(req)
     return res.sendStatus(201)
   } catch (err) {
-    return res.status(404).send('Class not found.')
+    return res.status(400).send('Class attendance not submitted.')
   }
 }
 

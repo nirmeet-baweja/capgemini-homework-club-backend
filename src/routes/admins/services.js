@@ -124,14 +124,50 @@ const getStudents = async () => {
   return students
 }
 
-// const createNewClass = async (req) => {
-//   const newClass = {
-//     date: '10/10/2021',
-//     comments: 'some text goes here',
-//     call_link: 'http://somelink',
-//     skills: [1, 3, 6],
-//   }
-// }
+const createNewClass = async (req) => {
+  const newClass = req.body
+  const newClassDate = new Date(newClass.date)
+
+  const today = new Date()
+  const dateMargin = new Date()
+  dateMargin.setDate(today.getDate() + 3)
+
+  /* admin can create a class only if it has at least 3 days margin
+    to give enough time to students and volunteers to sign-up */
+  if (newClassDate >= dateMargin) {
+    let newClassId
+    try {
+      const [classId] = await knex('classes').insert(
+        {
+          date: newClass.date,
+          comments: newClass.comments,
+          call_link: newClass.callLink,
+          is_submitted: false,
+        },
+        'id'
+      )
+      newClassId = classId
+    } catch (err) {
+      return { err: err.error }
+    }
+
+    // function to add class skills for the class just created
+    const addClassSkills = async () => {
+      await Promise.all(
+        newClass.skills.map(async (skill) => {
+          await knex('class_skills as cs').insert({
+            skill_id: skill,
+            class_id: newClassId,
+          })
+        })
+      )
+    }
+
+    await addClassSkills()
+    return { newClassId }
+  }
+  return { err: 'Cannot create a class for the given date.' }
+}
 
 const getClassDetails = async (classId) => {
   // get the data from classes table
@@ -221,7 +257,7 @@ const updateClassAttendance = async (req) => {
   const { classId } = req.params
   const attendanceDetails = req.body
 
-  // function to fetch the skills for each volunteer
+  // function to update the attendance for a given class
   const updateAttendance = async () => {
     await Promise.all(
       attendanceDetails.map(async (attendance) => {
@@ -243,6 +279,7 @@ export default {
   getUsers,
   getVolunteers,
   getStudents,
+  createNewClass,
   getAttendance,
   updateClassAttendance,
 }
