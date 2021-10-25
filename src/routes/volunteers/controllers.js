@@ -8,6 +8,6 @@ export const getSignedUpClasses = async (req, res) => {
     }
     return res.json(result.classes)
   } catch (err) {
-    return res.status(401).send('Classes not found.')
+    return res.status(404).send('Classes not found.')
   }
 }
