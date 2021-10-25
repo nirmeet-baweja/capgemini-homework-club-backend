@@ -70,8 +70,7 @@ const sendEmail = async (user, token) => {
      `,
   }
   try {
-    const response = await sgMail.send(msg)
-    console.log(response) // check what you have in response
+    await sgMail.send(msg)
     return undefined
   } catch (error) {
     console.error(error.toString())
@@ -256,9 +255,6 @@ const forgotPassword = async (req) => {
 
 // password token
 const resetPassword = async (req, res) => {
-  console.log('reset password in the reset password function')
-  console.log(req.url)
-
   // Get the token from params
   const resetLink = req.params.token
   const newPassword = req.body.password
@@ -273,11 +269,9 @@ const resetPassword = async (req, res) => {
   }
 
   try {
-    console.log(resetLink)
     // find user by the temporary token we stored earlier
     const [user] = await filterBy({ resetLink })
 
-    console.log(user)
     // if there is no user, send back an error
     if (!user) {
       return { err: 'We could not find a match for this link' }
