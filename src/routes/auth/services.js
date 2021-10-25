@@ -234,7 +234,7 @@ const forgotPassword = async (req) => {
     }
     // otherwise we need to create a temporary token that expires in 10 mins
     const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
-      expiresIn: '10m',
+      expiresIn: '30m',
     })
 
     // update resetLink property to be the temporary token and then send email
