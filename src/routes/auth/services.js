@@ -4,7 +4,7 @@ import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
 import config from '../../config'
 
-const saltRounds = 10
+const saltRounds = 2
 const studentRoleId = 3
 const volunteerRoleId = 2
 
@@ -84,7 +84,14 @@ const signIn = async (req) => {
   const { email, password } = req.body
   const [user] = await knex('users as u')
     .join('roles as r', 'r.id', 'u.role_id')
-    .select('u.id as userId', 'u.email', 'u.password', 'r.name as role')
+    .select(
+      'u.id as userId',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'u.password',
+      'r.name as role'
+    )
     .where('u.email', email)
     .orderBy('u.id')
 
@@ -93,14 +100,16 @@ const signIn = async (req) => {
   }
   const validPass = await bcrypt.compare(password, user.password)
   if (validPass) {
-    const { userId, role } = user
-    return { token: generateAccessToken({ userId, email, role }) }
+    const { userId, firstName, lastName, role } = user
+    return {
+      token: generateAccessToken({ userId, firstName, lastName, email, role }),
+    }
   }
   return { err: 'Wrong email and/or password.' }
 }
 
 const validateStudentSignUp = async (req) => {
-  const { firstName, lastName, password, email, roleId, cohortId } = req.body
+  const { firstName, lastName, password, email, cohortId } = req.body
 
   if (!isValidName(firstName) || !isValidName(lastName)) {
     return { err: 'Enter a valid name. Name cannot be empty' }
@@ -114,10 +123,6 @@ const validateStudentSignUp = async (req) => {
     return {
       err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
     }
-  }
-
-  if (roleId !== studentRoleId) {
-    return { err: 'The given role does not exist. Enter a valid role.' }
   }
 
   const isCohortValid = await isValidCohort(cohortId)
@@ -137,14 +142,20 @@ const studentSignUp = async (req) => {
     last_name: req.body.lastName,
     email: req.body.email,
     password: hash,
-    role_id: req.body.roleId,
+    role_id: studentRoleId,
     cohort_id: req.body.cohortId,
   }
 
   const [userId] = await knex('users').insert(user, 'id')
 
   const [createdUser] = await knex('users as u')
-    .select('u.id as userId', 'u.email', 'r.name as role')
+    .select(
+      'u.id as userId',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'r.name as role'
+    )
     .join('roles as r', 'r.id', 'u.role_id')
     .where('u.id', userId)
 
@@ -156,7 +167,7 @@ const studentSignUp = async (req) => {
 }
 
 const validateVolunteerSignUp = async (req) => {
-  const { firstName, lastName, password, email, roleId, skills } = req.body
+  const { firstName, lastName, password, email, skills } = req.body
 
   if (!isValidName(firstName) || !isValidName(lastName)) {
     return { err: 'Enter a valid name. Name cannot be empty' }
@@ -170,10 +181,6 @@ const validateVolunteerSignUp = async (req) => {
     return {
       err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
     }
-  }
-
-  if (roleId !== volunteerRoleId) {
-    return { err: 'The given role does not exist. Enter a valid role.' }
   }
 
   const areSkillsValid = await areValidSkills(skills)
@@ -196,7 +203,7 @@ const volunteerSignUp = async (req) => {
     last_name: req.body.lastName,
     email: req.body.email,
     password: hash,
-    role_id: req.body.roleId,
+    role_id: volunteerRoleId,
     cohort_id: null,
   }
 
@@ -209,7 +216,13 @@ const volunteerSignUp = async (req) => {
   await knex('user_skills').insert(userSkills)
 
   const [createdUser] = await knex('users as u')
-    .select('u.id as userId', 'u.email', 'r.name as role')
+    .select(
+      'u.id as userId',
+      'u.firstname as firstName',
+      'u.last_name as lastName',
+      'u.email',
+      'r.name as role'
+    )
     .join('roles as r', 'r.id', 'u.role_id')
     .where('u.id', userId)
 
