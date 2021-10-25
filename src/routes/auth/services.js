@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
 import config from '../../config'
-
-const sgMail = require('@sendgrid/mail')
 
 const saltRounds = 10
 const studentRoleId = 3
@@ -51,14 +50,11 @@ const areValidSkills = async (volunteerSkills) => {
 const generateAccessToken = (userDetails) =>
   jwt.sign(userDetails, config.tokenSecret, { expiresIn: '1hr' })
 
-function filterBy(filter) {
-  return knex('users').where(filter)
-}
+const filterBy = (filter) => knex('users').where(filter)
 
 // same here, looking into 'users' table by 'id' and then updating the values
-function update(id, changes) {
-  return knex('users').where({ id }).update(changes)
-}
+const update = (id, changes) => knex('users').where({ id }).update(changes)
+
 const sendEmail = async (user, token) => {
   sgMail.setApiKey(config.sendGridKey)
   const msg = {
@@ -82,6 +78,7 @@ const sendEmail = async (user, token) => {
     return 'An internal error occurred, unable to send the email.'
   }
 }
+
 /* *************************************************************** */
 
 const signIn = async (req) => {
@@ -225,8 +222,7 @@ const volunteerSignUp = async (req) => {
 }
 
 // forgot password
-
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req) => {
   const { email } = req.body
 
   try {
@@ -234,28 +230,30 @@ const forgotPassword = async (req, res) => {
     const [user] = await filterBy({ email })
     // if there is no user send back an error
     if (!user) {
-      res.status(404).json({ err: 'Invalid email' })
-    } else {
-      // otherwise we need to create a temporary token that expires in 10 mins
-      const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
-        expiresIn: '10m',
-      })
-      // update resetLink property to be the temporary token and then send email
-      await update(user.id, { resetLink })
-      // we'll define this function below
-      const error = await sendEmail(user, resetLink)
-      if (error) {
-        res.status(500).json({ err: error })
-      }
-      res.status(202).json({
-        message:
-          'we have sent you an email with reset password link, please check your emails.',
-      })
+      return { err: 'Invalid email.' }
+    }
+    // otherwise we need to create a temporary token that expires in 10 mins
+    const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
+      expiresIn: '10m',
+    })
+
+    // update resetLink property to be the temporary token and then send email
+    await update(user.id, { resetLink })
+
+    const err = await sendEmail(user, resetLink)
+    if (err) {
+      return { err }
+    }
+
+    return {
+      message:
+        'We have sent you an email with reset password link, please check your email.',
     }
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    return { err: error.message }
   }
 }
+
 // password token
 const resetPassword = async (req, res) => {
   console.log('reset password in the reset password function')
@@ -267,8 +265,8 @@ const resetPassword = async (req, res) => {
 
   // if there is a token we need to decode and check for no errors
   if (resetLink) {
-    jwt.verify(resetLink, config.tokenSecret, (error) => {
-      if (error) {
+    jwt.verify(resetLink, config.tokenSecret, (err) => {
+      if (err) {
         res.status(500).json({ message: 'Incorrect token or expired' })
       }
     })
@@ -282,9 +280,7 @@ const resetPassword = async (req, res) => {
     console.log(user)
     // if there is no user, send back an error
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: 'We could not find a match for this link' })
+      return { err: 'We could not find a match for this link' }
     }
     if (isValidPassword(newPassword)) {
       // otherwise we need to hash the new password  before saving it in the database
@@ -298,15 +294,13 @@ const resetPassword = async (req, res) => {
 
       await update(user.id, updatedCredentials)
 
-      return res.status(200).json({ message: 'Password updated' })
+      return { message: 'Password updated successfully.' }
     }
-    return res
-      .status(400)
-      .json({
-        err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
-      })
+    return {
+      err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
+    }
   } catch (error) {
-    return res.status(500).json({ err: error.message })
+    return { err: error.message }
   }
 }
 

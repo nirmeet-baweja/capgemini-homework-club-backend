@@ -43,19 +43,26 @@ export const signIn = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   try {
-    const result = await services.forgotPassword(req, res) // store into database
+    const result = await services.forgotPassword(req, res)
+    if (result.err) {
+      res.status(500).send(result.err)
+    }
     return res.status(200).send(result)
   } catch (err) {
     console.log(err)
-    return res.status(401).send({ err: 'Wrong credentials.' })
+    return res.status(401).send('Wrong credentials.')
   }
 }
+
 export const resetPassword = async (req, res) => {
   try {
-    const result = await services.resetPassword(req, res) // store into database
+    const result = await services.resetPassword(req, res)
+    if (result.err) {
+      res.status(500).send(result.err)
+    }
     return res.status(200).send(result)
   } catch (err) {
     console.log(err)
-    return res.status(401).send({ err: 'Wrong credentials.' })
+    return res.status(401).send('Wrong credentials.')
   }
 }
