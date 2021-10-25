@@ -59,28 +59,26 @@ function filterBy(filter) {
 function update(id, changes) {
   return knex('users').where({ id }).update(changes)
 }
-function sendEmail(user, token) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-  console.log(token)
-  console.log(`${process.env.clientURL}/reset-password/${token}`)
+const sendEmail = async (user, token) => {
+  sgMail.setApiKey(config.sendGridKey)
   const msg = {
     to: user.email,
-    from: 'debby21@mail.com', // your email
+    from: config.email, // your email
     subject: 'Reset password requested',
     html: `
-       <a href="${process.env.clientURL}/reset-password/${token}">${token}</a>
+
+    <p>Hi ${user.firstname[0]},</p>
+    <p>You requested to reset your password.</p>
+    <p> Please, click the link below to reset your password</p>
+       <a href="${config.URL}/reset-password/${token}">${token}</a>
      `,
   }
-
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log('Email sent')
-    })
-    .catch((error) => {
-      // Log friendly error
-      console.error(error.toString())
-    })
+  try {
+    const response = await sgMail.send(msg)
+    console.log(response) // check what you have in response
+  } catch (error) {
+    console.error(error.toString())
+  }
 }
 /* *************************************************************** */
 
@@ -95,13 +93,12 @@ const signIn = async (req) => {
   if (!user) {
     return { err: 'Wrong email and/or password.' }
   }
-  console.log(password, user.password)
   const validPass = await bcrypt.compare(password, user.password)
   if (validPass) {
     const { userId, role } = user
     return { token: generateAccessToken({ userId, email, role }) }
   }
-  return { err: 'Wrong user.' }
+  return { err: 'Wrong email and/or password.' }
 }
 
 const validateStudentSignUp = async (req) => {
@@ -243,11 +240,15 @@ const forgotPassword = async (req, res) => {
       })
       // update resetLink property to be the temporary token and then send email
       await update(user.id, { resetLink })
-      console.log(res)
       // we'll define this function below
       sendEmail(user, resetLink)
 
-      res.status(200).json({ message: 'Check your email' })
+      res
+        .status(200)
+        .json({
+          message:
+            'we have send you a email with reset password link, please check your emails.',
+        })
     }
   } catch (error) {
     res.status(500).json({ message: error.message })
