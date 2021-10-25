@@ -67,7 +67,7 @@ const sendEmail = async (user, token) => {
     subject: 'Reset password requested',
     html: `
 
-    <p>Hi ${user.firstname[0]},</p>
+    <p>Hi ${user.firstname},</p>
     <p>You requested to reset your password.</p>
     <p> Please, click the link below to reset your password</p>
        <a href="${config.URL}/reset-password/${token}">${token}</a>
@@ -243,12 +243,10 @@ const forgotPassword = async (req, res) => {
       // we'll define this function below
       sendEmail(user, resetLink)
 
-      res
-        .status(200)
-        .json({
-          message:
-            'we have send you a email with reset password link, please check your emails.',
-        })
+      res.status(200).json({
+        message:
+          'we have sent you an email with reset password link, please check your emails.',
+      })
     }
   } catch (error) {
     res.status(500).json({ message: error.message })
