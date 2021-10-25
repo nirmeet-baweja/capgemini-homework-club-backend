@@ -7,8 +7,8 @@ const config = {
   appUrl: process.env.APP_URL,
   tokenSecret: process.env.TOKEN_SECRET,
   sendGridKey: process.env.SENDGRID_API_KEY,
-  email: process.env.email_address,
-  URL: process.env.clientURL,
+  email: process.env.EMAIL_ADDRESS,
+  frontEndUrl: process.env.FRONTEND_URL,
 }
 
 export default config

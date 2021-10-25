@@ -70,14 +70,16 @@ const sendEmail = async (user, token) => {
     <p>Hi ${user.firstname},</p>
     <p>You requested to reset your password.</p>
     <p> Please, click the link below to reset your password</p>
-       <a href="${config.URL}/reset-password/${token}">${token}</a>
+       <a href="${config.frontEndUrl}/reset-password/${token}">${token}</a>
      `,
   }
   try {
     const response = await sgMail.send(msg)
     console.log(response) // check what you have in response
+    return undefined
   } catch (error) {
     console.error(error.toString())
+    return 'An internal error occurred, unable to send the email.'
   }
 }
 /* *************************************************************** */
@@ -232,7 +234,7 @@ const forgotPassword = async (req, res) => {
     const [user] = await filterBy({ email })
     // if there is no user send back an error
     if (!user) {
-      res.status(404).json({ error: 'Invalid email' })
+      res.status(404).json({ err: 'Invalid email' })
     } else {
       // otherwise we need to create a temporary token that expires in 10 mins
       const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
@@ -241,9 +243,11 @@ const forgotPassword = async (req, res) => {
       // update resetLink property to be the temporary token and then send email
       await update(user.id, { resetLink })
       // we'll define this function below
-      sendEmail(user, resetLink)
-
-      res.status(200).json({
+      const error = await sendEmail(user, resetLink)
+      if (error) {
+        res.status(500).json({ err: error })
+      }
+      res.status(202).json({
         message:
           'we have sent you an email with reset password link, please check your emails.',
       })
@@ -254,9 +258,12 @@ const forgotPassword = async (req, res) => {
 }
 // password token
 const resetPassword = async (req, res) => {
+  console.log('reset password in the reset password function')
+  console.log(req.url)
+
   // Get the token from params
   const resetLink = req.params.token
-  const newPassword = req.body
+  const newPassword = req.body.password
 
   // if there is a token we need to decode and check for no errors
   if (resetLink) {
@@ -268,31 +275,38 @@ const resetPassword = async (req, res) => {
   }
 
   try {
+    console.log(resetLink)
     // find user by the temporary token we stored earlier
     const [user] = await filterBy({ resetLink })
 
+    console.log(user)
     // if there is no user, send back an error
     if (!user) {
       return res
         .status(400)
         .json({ message: 'We could not find a match for this link' })
     }
+    if (isValidPassword(newPassword)) {
+      // otherwise we need to hash the new password  before saving it in the database
+      const hashPassword = await bcrypt.hash(newPassword, saltRounds)
 
-    // otherwise we need to hash the new password  before saving it in the database
-    const hashPassword = await bcrypt.hash(newPassword.password, saltRounds)
-    newPassword.password = hashPassword
+      // update user credentials and remove the temporary link from database before saving
+      const updatedCredentials = {
+        password: hashPassword,
+        resetLink: null,
+      }
 
-    // update user credentials and remove the temporary link from database before saving
-    const updatedCredentials = {
-      password: hashPassword,
-      resetLink: null,
+      await update(user.id, updatedCredentials)
+
+      return res.status(200).json({ message: 'Password updated' })
     }
-
-    await update(user.id, updatedCredentials)
-
-    return res.status(200).json({ message: 'Password updated' })
+    return res
+      .status(400)
+      .json({
+        err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
+      })
   } catch (error) {
-    return res.status(500).json({ message: error.message })
+    return res.status(500).json({ err: error.message })
   }
 }
 
