@@ -9,6 +9,15 @@ export const getUsers = async (req, res) => {
   }
 }
 
+export const getAdmins = async (req, res) => {
+  try {
+    const admins = await services.getAdmins()
+    return res.json(admins)
+  } catch (err) {
+    return res.status(404).send('admins not found.')
+  }
+}
+
 export const getVolunteers = async (req, res) => {
   try {
     const volunteers = await services.getVolunteers()

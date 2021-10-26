@@ -7,11 +7,13 @@ import {
   getClassDetails,
   updateClassAttendance,
   getAttendance,
+  getAdmins,
 } from './controllers'
 
 const router = express.Router()
 // localhost:3001/admins
 router.get('/users', getUsers)
+router.get('/admins', getAdmins)
 router.get('/volunteers', getVolunteers)
 router.get('/students', getStudents)
 router.post('/classes', createNewClass)
@@ -24,6 +26,7 @@ router.post('/classes', createNewClass)
   }
 */
 router.get('/class-details/:classId', getClassDetails)
+
 router.post('/class-details/:classId', updateClassAttendance)
 /* req.body should have
 [

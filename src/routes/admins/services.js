@@ -109,17 +109,55 @@ const getVolunteers = async () => {
   return volunteers
 }
 
+// const getStudents = async () => {
+//   const students = await knex('users as u')
+//     .select(
+//       'u.id',
+//       'u.firstname as firstName',
+//       'u.last_name as lastName',
+//       'u.email',
+//       'c.name as cohort'
+//     )
+//     .join('cohorts as c', 'c.id', 'u.cohort_id')
+//     .where('role_id', 3)
+//     .orderBy('u.id')
+//   return students
+// }
 const getStudents = async () => {
+  // console.log(req)
+  try {
+    const students = await knex('users as u')
+      .select(
+        'u.id',
+        'u.firstname as firstName',
+        'u.last_name as lastName',
+        'u.email',
+        'c.name as cohort'
+      )
+      .join('cohorts as c', 'c.id', 'u.cohort_id')
+      .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+      .where('role_id', 3)
+      .andWhere('csu.is_present', true)
+      .groupBy('u.id', 'c.name')
+      .count('csu.class_id as classSignedUp')
+      .orderBy('u.id')
+
+    return students
+  } catch (error) {
+    console.log(error)
+    return {}
+  }
+}
+
+const getAdmins = async () => {
   const students = await knex('users as u')
     .select(
       'u.id',
       'u.firstname as firstName',
       'u.last_name as lastName',
-      'u.email',
-      'c.name as cohort'
+      'u.email'
     )
-    .join('cohorts as c', 'c.id', 'u.cohort_id')
-    .where('role_id', 3)
+    .where('role_id', 1)
     .orderBy('u.id')
   return students
 }
@@ -282,4 +320,5 @@ export default {
   createNewClass,
   getAttendance,
   updateClassAttendance,
+  getAdmins,
 }
