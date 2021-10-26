@@ -71,6 +71,37 @@ const getVolunteersSignedUp = async (classId) => {
   return listOfVolunteers
 }
 
+/*
+  this function gives you number of classes user for a given userId,
+  has signed up for.
+*/
+const getClassesSignedUp = async (userId) => {
+  const classesSignedUp = await knex('users as u')
+    .select('u.id')
+    .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+    .where('u.id', userId)
+    .count('csu.class_id as classesSignedUp')
+    .groupBy('u.id')
+
+  return classesSignedUp
+}
+
+/*
+  this function gives you number of classes user for a given userId,
+  was present for.
+*/
+const getClassesAttended = async (userId) => {
+  const classesAttended = await knex('users as u')
+    .select('u.id')
+    .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+    .where('u.id', userId)
+    .andWhere('csu.is_present', true)
+    .count('csu.class_id as classesAttended')
+    .groupBy('u.id')
+
+  return classesAttended
+}
+
 /* ************************************************************************* */
 
 const getUsers = async () => {
@@ -123,9 +154,19 @@ const getVolunteers = async () => {
 //     .orderBy('u.id')
 //   return students
 // }
+
 const getStudents = async () => {
   // console.log(req)
   try {
+    /* ************************************* */
+    // this is helper code.
+    const classesSignedUp = await getClassesSignedUp(11)
+    console.log(classesSignedUp)
+
+    const classesAttended = await getClassesAttended(11)
+    console.log(classesAttended)
+    /* ************************************* */
+
     const students = await knex('users as u')
       .select(
         'u.id',
@@ -137,7 +178,6 @@ const getStudents = async () => {
       .join('cohorts as c', 'c.id', 'u.cohort_id')
       .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
       .where('role_id', 3)
-      .andWhere('csu.is_present', true)
       .groupBy('u.id', 'c.name')
       .count('csu.class_id as classSignedUp')
       .orderBy('u.id')
