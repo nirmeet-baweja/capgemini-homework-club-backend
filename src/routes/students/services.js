@@ -23,25 +23,18 @@ const cancelClassSignUp = async (req) => {
   const { userId } = req.user
   const { classId } = req.params
 
-  console.log('cancelClassSignUp')
-  console.log(userId)
-  console.log(classId)
-
   let classesSignedUp
 
   try {
     classesSignedUp = await knex('class_sign_ups')
-      .update('is_cancelled', true)
+      .update({ is_cancelled: true }, 'class_id')
       .where('user_id', userId)
       .andWhere('class_id', classId)
   } catch (err) {
-    console.log(err)
     return { err: 'Unable to update class sign up.' }
   }
 
-  // const classes = classesSignedUp.map((classSignedUp) => classSignedUp.classId)
-  console.log(classesSignedUp)
-  return classesSignedUp
+  return classesSignedUp[0]
 }
 
 export default {
