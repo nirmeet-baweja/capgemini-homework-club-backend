@@ -2,13 +2,27 @@ import services from './services'
 
 export const getSignedUpClasses = async (req, res) => {
   try {
-    const result = await services.getSignedUpClasses(req) // store into database
+    const result = await services.getSignedUpClasses(req)
     if (result.err) {
       return res.status(404).send(result.err)
     }
     return res.json(result.classes)
   } catch (err) {
     return res.status(404).send('Classes not found.')
+  }
+}
+
+export const signUpForClass = async (req, res) => {
+  try {
+    const result = await services.signUpForClass(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res
+      .status(200)
+      .send({ message: `Successfully signed-up for class ${result}` })
+  } catch (err) {
+    return res.status(400).send('Unable to sign-up for the class.')
   }
 }
 
