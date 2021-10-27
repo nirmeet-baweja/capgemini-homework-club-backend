@@ -7,9 +7,7 @@ import config from '../config'
 /* Helper functions */
 
 const checkUserAccess = (role, path) => {
-  console.log('checkUserAccess')
   const tmpStr = path.match('^/(.*?)/')
-  console.log(tmpStr)
   const startingPath = tmpStr[1]
   const [selectedRole] = roles.filter((item) => item.role === role)
   return role === 'Admin' || selectedRole.paths.includes(startingPath)
@@ -17,8 +15,6 @@ const checkUserAccess = (role, path) => {
 /* *************************************************************** */
 
 export const authenticateJWT = (req, res, next) => {
-  console.log('authenticateJWT')
-  console.log(req.url)
   const authHeader = req.headers.authorization
 
   if (authHeader) {
