@@ -12,6 +12,20 @@ export const getSignedUpClasses = async (req, res) => {
   }
 }
 
+export const signUpForClass = async (req, res) => {
+  try {
+    const result = await services.signUpForClass(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res
+      .status(200)
+      .send({ message: `Successfully signed-up for class ${result}` })
+  } catch (err) {
+    return res.status(400).send('Unable to sign-up for the class.')
+  }
+}
+
 export const cancelClassSignUp = async (req, res) => {
   try {
     const result = await services.cancelClassSignUp(req)
