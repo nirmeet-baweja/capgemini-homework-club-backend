@@ -196,23 +196,36 @@ const getStudents = async () => {
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
     .where('role_id', 3)
     .groupBy('u.id', 'c.name')
-    // .count('csu.class_id as classSignedUp')
     .orderBy('u.id')
+
   // function to fetch the attendance for each student
   const fetchUserAttendance = async () => {
     await Promise.all(
       students.map(async (student, index) => {
         const classesSignedUp = await getClassesSignedUp(student.id)
+        if (classesSignedUp === undefined || classesSignedUp.length === 0) {
+          return classesSignedUp
+        }
         const classesAttended = await getClassesAttended(student.id)
+        if (classesAttended === undefined || classesAttended.length === 0) {
+          return classesAttended
+        }
         const classesMissed = await getClassesMissed(student.id)
+        if (classesMissed === undefined || classesMissed.length === 0) {
+          return classesMissed
+        }
         const classesCancelled = await getClassesCancelled(student.id)
+        if (classesCancelled === undefined || classesCancelled.length === 0) {
+          return classesCancelled
+        }
         students[index] = {
           ...students[index],
-          classesSignedUp,
-          classesAttended,
-          classesMissed,
-          classesCancelled,
+          classesSignedUp: classesSignedUp[0].classesSignedUp,
+          classesAttended: classesAttended[0].classesAttended,
+          classesMissed: classesMissed[0].classesMissed,
+          classesCancelled: classesCancelled[0].classesCancelled,
         }
+        return undefined
       })
     )
   }
@@ -242,7 +255,7 @@ const createNewClass = async (req) => {
   dateMargin.setDate(today.getDate() + 3)
 
   /* admin can create a class only if it has at least 3 days margin
-    to give enough time to students and volunteers to sign-up */
+      to give enough time to students and volunteers to sign-up */
   if (newClassDate >= dateMargin) {
     let newClassId
     try {
