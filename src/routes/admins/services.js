@@ -1,5 +1,6 @@
 import knex from '../../knex'
 
+const adminRoleId = 1
 const volunteerRoleId = 2
 const studentRoleId = 3
 
@@ -146,6 +147,34 @@ const getUsers = async () => {
   return users
 }
 
+const updateAdminRole = async (req) => {
+  const { adminId } = req.params
+
+  const [admin] = await knex('users')
+    .select('firstname')
+    .where('id', adminId)
+    .andWhere('role_id', adminRoleId)
+
+  if (!admin) {
+    /*
+      if the user doesn't exist or is not an admin,
+      don't change their role
+    */
+    return { err: 'Unable to change the role of this user to volunteer.' }
+  }
+
+  try {
+    const [result] = await knex('users')
+      .update({ role_id: volunteerRoleId }, 'firstname')
+      .where('id', adminId)
+    return { message: `Successfully changed ${result}'s role to volunteer` }
+  } catch (err) {
+    return {
+      err: 'Internal Server error occurred and failed to update the role.',
+    }
+  }
+}
+
 const getVolunteers = async () => {
   const volunteers = await knex('users')
     .select('id', 'firstname as firstName', 'last_name as lastName', 'email')
@@ -168,20 +197,33 @@ const getVolunteers = async () => {
   return volunteers
 }
 
-// const getStudents = async () => {
-//   const students = await knex('users as u')
-//     .select(
-//       'u.id',
-//       'u.firstname as firstName',
-//       'u.last_name as lastName',
-//       'u.email',
-//       'c.name as cohort'
-//     )
-//     .join('cohorts as c', 'c.id', 'u.cohort_id')
-//     .where('role_id', 3)
-//     .orderBy('u.id')
-//   return students
-// }
+const updateVolunteerRole = async (req) => {
+  const { volunteerId } = req.params
+
+  const [volunteer] = await knex('users')
+    .select('firstname')
+    .where('id', volunteerId)
+    .andWhere('role_id', volunteerRoleId)
+
+  if (!volunteer) {
+    /*
+      if the user doesn't exist or is not a volunteer,
+      don't promote them
+    */
+    return { err: 'Cannot promote this user to admin.' }
+  }
+
+  try {
+    const [result] = await knex('users')
+      .update({ role_id: adminRoleId }, 'firstname')
+      .where('id', volunteerId)
+    return { message: `Successfully promoted ${result} to admin` }
+  } catch (err) {
+    return {
+      err: 'Internal Server error occurred and failed to update the role.',
+    }
+  }
+}
 
 const getStudents = async () => {
   const students = await knex('users as u')
@@ -399,7 +441,9 @@ const updateClassAttendance = async (req) => {
 export default {
   getClassDetails,
   getUsers,
+  updateAdminRole,
   getVolunteers,
+  updateVolunteerRole,
   getStudents,
   createNewClass,
   getAttendance,

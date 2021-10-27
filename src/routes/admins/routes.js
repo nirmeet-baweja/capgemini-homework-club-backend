@@ -1,7 +1,9 @@
 import express from 'express'
 import {
   getUsers,
+  updateAdminRole,
   getVolunteers,
+  updateVolunteerRole,
   getStudents,
   createNewClass,
   getClassDetails,
@@ -14,7 +16,9 @@ const router = express.Router()
 // localhost:3001/admins
 router.get('/users', getUsers)
 router.get('/admins', getAdmins)
+router.put('/admins/:adminId', updateAdminRole)
 router.get('/volunteers', getVolunteers)
+router.put('/volunteers/:volunteerId', updateVolunteerRole)
 router.get('/students', getStudents)
 router.post('/classes', createNewClass)
 /* req.body should contain
@@ -26,8 +30,7 @@ router.post('/classes', createNewClass)
   }
 */
 router.get('/class-details/:classId', getClassDetails)
-
-router.post('/class-details/:classId', updateClassAttendance)
+router.put('/class-details/:classId', updateClassAttendance)
 /* req.body should have
 [
   { userId: 41, isPresent: false },

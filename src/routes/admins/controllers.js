@@ -17,6 +17,17 @@ export const getAdmins = async (req, res) => {
     return res.status(404).send('admins not found.')
   }
 }
+export const updateAdminRole = async (req, res) => {
+  try {
+    const result = await services.updateAdminRole(req)
+    if (result.err) {
+      return res.status(500).send(result.err)
+    }
+    return res.status(201).send(result)
+  } catch (err) {
+    return res.status(400).send('Class attendance not submitted.')
+  }
+}
 
 export const getVolunteers = async (req, res) => {
   try {
@@ -24,6 +35,18 @@ export const getVolunteers = async (req, res) => {
     return res.json(volunteers)
   } catch (err) {
     return res.status(404).send('Volunteers not found.')
+  }
+}
+
+export const updateVolunteerRole = async (req, res) => {
+  try {
+    const result = await services.updateVolunteerRole(req)
+    if (result.err) {
+      return res.status(500).send(result.err)
+    }
+    return res.status(201).send(result)
+  } catch (err) {
+    return res.status(400).send('Class attendance not submitted.')
   }
 }
 
