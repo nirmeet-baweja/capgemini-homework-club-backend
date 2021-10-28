@@ -2,15 +2,15 @@
   {
     "role": "Volunteer",
     "paths": [
-      "/data",
-      "/volunteers"
+      "data",
+      "volunteers"
     ]
   },
   {
     "role": "Student",
     "paths": [
-      "/data",
-      "/students"
+      "data",
+      "students"
     ]
   }
 ]

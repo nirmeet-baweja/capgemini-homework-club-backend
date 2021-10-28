@@ -146,7 +146,7 @@ const getClassWithId = async (classId) => {
     .where('id', classId)
 
   if (classDetails.length === 0) {
-    throw new Error('Invalid class ID.')
+    return { err: 'Invalid class ID.' }
   }
 
   const skills = await getClassSkills(classId)

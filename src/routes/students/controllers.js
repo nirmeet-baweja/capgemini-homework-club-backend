@@ -1,9 +1,39 @@
-export const getStudent = async (req, res) => {
-  // const { userId } = req.params
+import services from './services'
+
+export const getSignedUpClasses = async (req, res) => {
   try {
-    return res.status(200).send({ students: 'student data' })
+    const result = await services.getSignedUpClasses(req)
+    if (result.err) {
+      return res.status(404).send(result.err)
+    }
+    return res.json(result.classes)
   } catch (err) {
-    console.log(err)
-    return res.status(400).send('Student not found')
+    return res.status(404).send('Classes not found.')
+  }
+}
+
+export const signUpForClass = async (req, res) => {
+  try {
+    const result = await services.signUpForClass(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res.status(200).json(result)
+  } catch (err) {
+    return res.status(400).send('Unable to sign-up for the class.')
+  }
+}
+
+export const cancelClassSignUp = async (req, res) => {
+  try {
+    const result = await services.cancelClassSignUp(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res
+      .status(200)
+      .send({ message: `Cancelled the sign-up for class ${result}` })
+  } catch (err) {
+    return res.status(400).send('Unable to cancel class sign up.')
   }
 }

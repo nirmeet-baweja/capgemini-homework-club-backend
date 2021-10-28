@@ -1,9 +1,15 @@
 import express from 'express'
-import { getStudent } from './controllers'
+import {
+  getSignedUpClasses,
+  signUpForClass,
+  cancelClassSignUp,
+} from './controllers'
 
 const router = express.Router()
 
 // localhost:3001/students
-router.get('/:userId', getStudent)
+router.get('/class-sign-ups', getSignedUpClasses)
+router.post('/class-sign-ups/:classId', signUpForClass)
+router.put('/class-sign-ups/cancel/:classId', cancelClassSignUp)
 
 export default router

@@ -40,6 +40,9 @@ export const getClassWithId = async (req, res) => {
   try {
     const { classId } = req.params
     const classDetails = await services.getClassWithId(classId)
+    if (classDetails.err) {
+      return res.status(404).send(classDetails.err)
+    }
     return res.json(classDetails)
   } catch (err) {
     return res.status(404).send('Class not found.')
