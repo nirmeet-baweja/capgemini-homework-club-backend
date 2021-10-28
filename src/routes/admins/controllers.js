@@ -14,9 +14,10 @@ export const getAdmins = async (req, res) => {
     const admins = await services.getAdmins()
     return res.json(admins)
   } catch (err) {
-    return res.status(404).send('admins not found.')
+    return res.status(404).send('Admins not found.')
   }
 }
+
 export const updateAdminRole = async (req, res) => {
   try {
     const result = await services.updateAdminRole(req)
@@ -25,7 +26,7 @@ export const updateAdminRole = async (req, res) => {
     }
     return res.status(201).send(result)
   } catch (err) {
-    return res.status(400).send('Class attendance not submitted.')
+    return res.status(400).send('Failed to change the user role.')
   }
 }
 
@@ -46,7 +47,7 @@ export const updateVolunteerRole = async (req, res) => {
     }
     return res.status(201).send(result)
   } catch (err) {
-    return res.status(400).send('Class attendance not submitted.')
+    return res.status(400).send('Failed to change the user role.')
   }
 }
 
