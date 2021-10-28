@@ -77,13 +77,13 @@ const getVolunteersSignedUp = async (classId) => {
   has signed up for.
 */
 const getClassesSignedUp = async (userId) => {
-  const classesSignedUp = await knex('users as u')
+  const [{ classesSignedUp }] = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
     .where('u.id', userId)
     .count('csu.class_id as classesSignedUp')
     .groupBy('u.id')
-
+  // console.log(classesSignedUp);
   return classesSignedUp
 }
 
@@ -92,7 +92,7 @@ const getClassesSignedUp = async (userId) => {
   was present for.
 */
 const getClassesAttended = async (userId) => {
-  const classesAttended = await knex('users as u')
+  const [{ classesAttended }] = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
     .where('u.id', userId)
@@ -104,30 +104,32 @@ const getClassesAttended = async (userId) => {
 }
 
 /* this function gives you the number of classes a given user with with a particular userId was absent for */
-
+// eslint-disable-next-line no-unused-vars
 const getClassesMissed = async (userId) => {
-  const classesMissed = await knex('users as u')
+  const [{ classesMissed }] = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
     .where('u.id', userId)
     .andWhere('csu.is_present', false)
     .count('csu.class_id as classesMissed')
     .groupBy('u.id')
-
+  // console.log('classesMissed')
+  // console.log(classesMissed);
   return classesMissed
 }
 
 /* this function gives you the number of classes a given user with with a particular userId cancelled */
-
+// eslint-disable-next-line no-unused-vars
 const getClassesCancelled = async (userId) => {
-  const classesCancelled = await knex('users as u')
+  const [{ classesCancelled }] = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
     .where('u.id', userId)
     .andWhere('csu.is_cancelled', true)
     .count('csu.class_id as classesCancelled')
     .groupBy('u.id')
-
+  // console.log('classesCancelled')
+  // console.log(classesCancelled);
   return classesCancelled
 }
 
@@ -244,30 +246,22 @@ const getStudents = async () => {
   const fetchUserAttendance = async () => {
     await Promise.all(
       students.map(async (student, index) => {
+        console.log('fetching details')
         const classesSignedUp = await getClassesSignedUp(student.id)
-        if (classesSignedUp === undefined || classesSignedUp.length === 0) {
-          return classesSignedUp
-        }
+        console.log(classesSignedUp)
         const classesAttended = await getClassesAttended(student.id)
-        if (classesAttended === undefined || classesAttended.length === 0) {
-          return classesAttended
-        }
-        const classesMissed = await getClassesMissed(student.id)
-        if (classesMissed === undefined || classesMissed.length === 0) {
-          return classesMissed
-        }
-        const classesCancelled = await getClassesCancelled(student.id)
-        if (classesCancelled === undefined || classesCancelled.length === 0) {
-          return classesCancelled
-        }
+        console.log(classesAttended)
+        // const classesMissed = await getClassesMissed(student.id)
+        // console.log(classesMissed);
+        // const classesCancelled = await getClassesCancelled(student.id)
+        // console.log(classesCancelled)
         students[index] = {
           ...students[index],
-          classesSignedUp: classesSignedUp[0].classesSignedUp,
-          classesAttended: classesAttended[0].classesAttended,
-          classesMissed: classesMissed[0].classesMissed,
-          classesCancelled: classesCancelled[0].classesCancelled,
+          classesSignedUp,
+          classesAttended,
+          // classesMissed,
+          // classesCancelled,
         }
-        return undefined
       })
     )
   }
