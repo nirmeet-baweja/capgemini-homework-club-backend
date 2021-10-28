@@ -212,18 +212,29 @@ const getVolunteers = async () => {
     .where('role_id', 2)
     .orderBy('id')
 
-  // function to fetch the skills for each volunteer
-  const fetchUserSkills = async () => {
+  // function to fetch the skills and attendance for each volunteer
+  const fetchUserSkillsAndAttendance = async () => {
     await Promise.all(
       volunteers.map(async (volunteer, index) => {
+        const classesSignedUp = await getClassesSignedUp(volunteer.id)
+        const classesAttended = await getClassesAttended(volunteer.id)
+        const classesMissed = await getClassesMissed(volunteer.id)
+        const classesCancelled = await getClassesCancelled(volunteer.id)
         const skills = await getUserSkills(volunteer.id)
         // amend the skills for each class
-        volunteers[index] = { ...volunteers[index], skills }
+        volunteers[index] = {
+          ...volunteers[index],
+          classesSignedUp,
+          classesAttended,
+          classesMissed,
+          classesCancelled,
+          skills,
+        }
       })
     )
   }
 
-  await fetchUserSkills()
+  await fetchUserSkillsAndAttendance()
 
   return volunteers
 }
@@ -272,7 +283,7 @@ const getStudents = async () => {
     .orderBy('u.id')
 
   // function to fetch the attendance for each student
-  const fetchUserAttendance = async () => {
+  const fetchStudentsAttendance = async () => {
     await Promise.all(
       students.map(async (student, index) => {
         const classesSignedUp = await getClassesSignedUp(student.id)
@@ -291,7 +302,7 @@ const getStudents = async () => {
     )
   }
 
-  await fetchUserAttendance()
+  await fetchStudentsAttendance()
   return students
 }
 
