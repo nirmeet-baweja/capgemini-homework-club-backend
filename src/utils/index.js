@@ -15,6 +15,11 @@ const checkUserAccess = (role, path) => {
 /* *************************************************************** */
 
 export const authenticateJWT = (req, res, next) => {
+  // make the /auth/reset-password/:token as a public route
+  if (req.url.includes('/auth/reset-password')) {
+    next()
+  }
+
   const authHeader = req.headers.authorization
 
   if (authHeader) {

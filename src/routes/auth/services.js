@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
 import config from '../../config'
 
@@ -48,6 +49,34 @@ const areValidSkills = async (volunteerSkills) => {
 
 const generateAccessToken = (userDetails) =>
   jwt.sign(userDetails, config.tokenSecret, { expiresIn: '1hr' })
+
+const filterBy = (filter) => knex('users').where(filter)
+
+// same here, looking into 'users' table by 'id' and then updating the values
+const update = (id, changes) => knex('users').where({ id }).update(changes)
+
+const sendEmail = async (user, token) => {
+  sgMail.setApiKey(config.sendGridKey)
+  const msg = {
+    to: user.email,
+    from: config.email, // your email
+    subject: 'Reset password requested',
+    html: `
+
+    <p>Hi ${user.firstname},</p>
+    <p>You requested to reset your password.</p>
+    <p> Please, click the link below to reset your password</p>
+       <a href="${config.frontEndUrl}/reset-password/${token}">${token}</a>
+     `,
+  }
+  try {
+    await sgMail.send(msg)
+    return undefined
+  } catch (error) {
+    console.error(error.toString())
+    return 'An internal error occurred, unable to send the email.'
+  }
+}
 
 /* *************************************************************** */
 
@@ -204,10 +233,90 @@ const volunteerSignUp = async (req) => {
   return { err: 'Please check your details and try again.' }
 }
 
+// forgot password
+const forgotPassword = async (req) => {
+  const { email } = req.body
+
+  try {
+    // look for email in database
+    const [user] = await filterBy({ email })
+    // if there is no user send back an error
+    if (!user) {
+      return { err: 'Invalid email.' }
+    }
+    // otherwise we need to create a temporary token that expires in 10 mins
+    const resetLink = jwt.sign({ user: user.email }, config.tokenSecret, {
+      expiresIn: '30m',
+    })
+
+    // update resetLink property to be the temporary token and then send email
+    await update(user.id, { resetLink })
+
+    const err = await sendEmail(user, resetLink)
+    if (err) {
+      return { err }
+    }
+
+    return {
+      message:
+        'We have sent you an email with reset password link, please check your email.',
+    }
+  } catch (error) {
+    return { err: error.message }
+  }
+}
+
+// password token
+const resetPassword = async (req, res) => {
+  // Get the token from params
+  const resetLink = req.params.token
+  const newPassword = req.body.password
+
+  // if there is a token we need to decode and check for no errors
+  if (resetLink) {
+    jwt.verify(resetLink, config.tokenSecret, (err) => {
+      if (err) {
+        res.status(500).json({ message: 'Incorrect token or expired' })
+      }
+    })
+  }
+
+  try {
+    // find user by the temporary token we stored earlier
+    const [user] = await filterBy({ resetLink })
+
+    // if there is no user, send back an error
+    if (!user) {
+      return { err: 'We could not find a match for this link' }
+    }
+    if (isValidPassword(newPassword)) {
+      // otherwise we need to hash the new password  before saving it in the database
+      const hashPassword = await bcrypt.hash(newPassword, saltRounds)
+
+      // update user credentials and remove the temporary link from database before saving
+      const updatedCredentials = {
+        password: hashPassword,
+        resetLink: null,
+      }
+
+      await update(user.id, updatedCredentials)
+
+      return { message: 'Password updated successfully.' }
+    }
+    return {
+      err: 'Password should include one lowercase letter, one uppercase letter, one numeric value and one special character (@$!%*#?&) and must be longer than 8 characters.',
+    }
+  } catch (error) {
+    return { err: error.message }
+  }
+}
+
 export default {
   validateStudentSignUp,
   studentSignUp,
   validateVolunteerSignUp,
   volunteerSignUp,
   signIn,
+  forgotPassword,
+  resetPassword,
 }
