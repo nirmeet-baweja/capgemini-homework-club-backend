@@ -7,7 +7,7 @@ import config from '../config'
 /* Helper functions */
 
 const checkUserAccess = (role, path) => {
-  const tmpStr = path.match('^(.*)/')
+  const tmpStr = path.match('^/(.*?)/')
   const startingPath = tmpStr[1]
   const [selectedRole] = roles.filter((item) => item.role === role)
   return role === 'Admin' || selectedRole.paths.includes(startingPath)
