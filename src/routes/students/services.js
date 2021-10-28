@@ -1,4 +1,5 @@
 import knex from '../../knex'
+import services from '../common/services'
 
 const cutOffTime = 17 // set it as 5pm
 
@@ -60,6 +61,7 @@ const signUpForClass = async (req) => {
 
   if (isSignUpAllowed) {
     let classSignedUp
+    let classDetails
 
     try {
       classSignedUp = await knex('class_sign_ups')
@@ -75,6 +77,16 @@ const signUpForClass = async (req) => {
         )
         .onConflict(['user_id', 'class_id'])
         .merge()
+
+      classDetails = await services.getClassWithId(classSignedUp[0])
+      if (classDetails.err) {
+        return { err: classDetails.err }
+      }
+      classDetails = {
+        ...classDetails,
+        userComments: comments,
+        userSkill: skillId,
+      }
     } catch (err) {
       return { err: 'Unable to sign up for class.' }
     }

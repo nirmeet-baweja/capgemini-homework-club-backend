@@ -18,9 +18,7 @@ export const signUpForClass = async (req, res) => {
     if (result.err) {
       return res.status(400).send(result.err)
     }
-    return res
-      .status(200)
-      .send({ message: `Successfully signed-up for class ${result}` })
+    return res.status(200).json(result)
   } catch (err) {
     return res.status(400).send('Unable to sign-up for the class.')
   }
