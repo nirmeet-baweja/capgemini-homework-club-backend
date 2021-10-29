@@ -71,6 +71,7 @@ const signUpForClass = async (req) => {
             class_id: classId,
             skill_id: skillId,
             is_cancelled: false,
+            is_present: false,
             comments,
           },
           'class_id'
