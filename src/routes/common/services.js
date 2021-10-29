@@ -96,7 +96,7 @@ const getClasses = async (type) => {
           'c.is_submitted as isSubmitted'
         )
         .where('date', '<=', today)
-        .orderBy('date')
+        .orderBy('date', 'desc')
       break
     default:
       classes = undefined
