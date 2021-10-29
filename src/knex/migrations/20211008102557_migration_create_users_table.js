@@ -5,7 +5,7 @@ exports.up = function (knex) {
     table.string('last_name', 255).notNullable()
     table.string('email', 255).notNullable().unique()
     table.string('password', 255).notNullable()
-    table.string('resetLink', 255)
+    table.string('resetLink')
     table.integer('role_id').references('id').inTable('roles').notNullable()
     table.integer('cohort_id').references('id').inTable('cohorts')
     table.timestamp('created_at').defaultTo(knex.fn.now())
