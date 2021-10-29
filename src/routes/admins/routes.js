@@ -9,11 +9,13 @@ import {
   getClassDetails,
   updateClassAttendance,
   getAttendance,
+  getAdmins,
 } from './controllers'
 
 const router = express.Router()
 // localhost:3001/admins
 router.get('/users', getUsers)
+router.get('/admins', getAdmins)
 router.put('/admins/:adminId', updateAdminRole)
 router.get('/volunteers', getVolunteers)
 router.put('/volunteers/:volunteerId', updateVolunteerRole)
