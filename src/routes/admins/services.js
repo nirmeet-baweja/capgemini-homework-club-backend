@@ -55,8 +55,10 @@ const getVolunteersSignedUp = async (classId) => {
       'csu.is_present as isPresent'
     )
     .join('users as u', 'u.id', 'csu.user_id')
-    .where('csu.class_id', classId)
-    .andWhere('u.role_id', 2)
+    .where(function () {
+      this.where('u.role_id', adminRoleId).orWhere('u.role_id', volunteerRoleId)
+    })
+    .andWhere('csu.class_id', classId)
 
   // function to fetch the skills for each volunteer
   const fetchUserSkills = async () => {
@@ -314,8 +316,10 @@ const createNewClass = async (req) => {
   const dateMargin = new Date()
   dateMargin.setDate(today.getDate() + 3)
 
-  /* admin can create a class only if it has at least 3 days margin
-      to give enough time to students and volunteers to sign-up */
+  /*
+    admin can create a class only if it has at least 3 days margin
+    to give enough time to students and volunteers to sign-up
+  */
   if (newClassDate >= dateMargin) {
     let newClassId
     try {
@@ -330,7 +334,7 @@ const createNewClass = async (req) => {
       )
       newClassId = classId
     } catch (err) {
-      return { err: err.error }
+      return { err: 'Failed to create the class.' }
     }
 
     // function to add class skills for the class just created
