@@ -56,7 +56,6 @@ export const getStudents = async (req, res) => {
     const students = await services.getStudents()
     return res.json(students)
   } catch (err) {
-    console.log(err)
     return res.status(404).send('Students not found.')
   }
 }
