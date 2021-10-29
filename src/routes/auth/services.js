@@ -125,7 +125,7 @@ const validateStudentSignUp = async (req) => {
     }
   }
 
-  const isCohortValid = await isValidCohort(cohortId)
+  const isCohortValid = await isValidCohort(+cohortId)
 
   if (!isCohortValid) {
     return { err: 'The given cohort does not exist. Enter a valid cohort.' }
@@ -136,14 +136,13 @@ const validateStudentSignUp = async (req) => {
 
 const studentSignUp = async (req) => {
   const hash = await bcrypt.hash(req.body.password, saltRounds)
-
   const user = {
     firstname: req.body.firstName,
     last_name: req.body.lastName,
     email: req.body.email,
     password: hash,
     role_id: studentRoleId,
-    cohort_id: req.body.cohortId,
+    cohort_id: Number(req.body.cohortId),
   }
 
   const [userId] = await knex('users').insert(user, 'id')
