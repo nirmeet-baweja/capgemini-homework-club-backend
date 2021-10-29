@@ -98,8 +98,10 @@ const getClassesAttended = async (userId) => {
   const classesAttended = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+    .join('classes as c', 'u.id', 'c.class_id')
     .where('u.id', userId)
     .andWhere('csu.is_present', true)
+    .andWhere('c.is_submitted', true)
     .count('csu.class_id as classesAttended')
     .groupBy('u.id')
 
@@ -117,8 +119,10 @@ const getClassesMissed = async (userId) => {
   const classesMissed = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+    .join('classes as c', 'u.id', 'c.class_id')
     .where('u.id', userId)
     .andWhere('csu.is_present', false)
+    .andWhere('c.is_submitted', true)
     .count('csu.class_id as classesMissed')
     .groupBy('u.id')
 
