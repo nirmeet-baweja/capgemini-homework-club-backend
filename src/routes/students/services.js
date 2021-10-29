@@ -91,7 +91,7 @@ const signUpForClass = async (req) => {
     } catch (err) {
       return { err: 'Unable to sign up for class.' }
     }
-    return classSignedUp[0]
+    return classDetails
   }
   return {
     err: 'Cut-off time for the class sign-up is over, you can no longer sign up for this class.',
