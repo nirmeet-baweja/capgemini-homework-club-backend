@@ -331,6 +331,15 @@ const updateClassAttendance = async (req) => {
   await knex('classes').where('id', classId).update({ is_submitted: true })
 }
 
+const createNewCohort = async (req) => {
+  const newCohort = req.body
+  if (!newCohort.cohortName) {
+    return {}
+  }
+  return {}
+  // const result = await knex('cohorts').insert()
+}
+
 export default {
   getClassDetails,
   getUsers,
@@ -341,4 +350,5 @@ export default {
   createNewClass,
   getAttendance,
   updateClassAttendance,
+  createNewCohort,
 }

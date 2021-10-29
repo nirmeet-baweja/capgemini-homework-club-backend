@@ -9,6 +9,7 @@ import {
   getClassDetails,
   updateClassAttendance,
   getAttendance,
+  createNewCohort,
 } from './controllers'
 
 const router = express.Router()
@@ -37,5 +38,6 @@ router.put('/class-details/:classId', updateClassAttendance)
 ]
 */
 router.get('/attendance', getAttendance)
+router.post('/cohorts', createNewCohort)
 
 export default router
