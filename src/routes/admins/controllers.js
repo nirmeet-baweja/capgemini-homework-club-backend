@@ -84,8 +84,11 @@ export const getClassDetails = async (req, res) => {
 
 export const updateClassAttendance = async (req, res) => {
   try {
-    await services.updateClassAttendance(req)
-    return res.sendStatus(201)
+    const result = await services.updateClassAttendance(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res.status(201).send(result)
   } catch (err) {
     return res.status(400).send('Class attendance not submitted.')
   }

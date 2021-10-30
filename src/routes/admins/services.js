@@ -442,21 +442,35 @@ const updateClassAttendance = async (req) => {
   const { classId } = req.params
   const attendanceDetails = req.body
 
-  // function to update the attendance for a given class
-  const updateAttendance = async () => {
-    await Promise.all(
-      attendanceDetails.map(async (attendance) => {
-        await knex('class_sign_ups as csu')
-          .where('csu.class_id', classId)
-          .andWhere('csu.user_id', attendance.userId)
-          .update({ is_present: attendance.isPresent })
-      })
-    )
+  const today = new Date()
+  today.setHours(23, 59, 59, 59)
+
+  let classDate = await knex('classes').select('date').where('id', classId)
+  classDate = classDate[0].date
+
+  if (classDate < today) {
+    // function to update the attendance for a given class
+    const updateAttendance = async () => {
+      await Promise.all(
+        attendanceDetails.map(async (attendance) => {
+          await knex('class_sign_ups as csu')
+            .where('csu.class_id', classId)
+            .andWhere('csu.user_id', attendance.userId)
+            .update({ is_present: attendance.isPresent })
+        })
+      )
+    }
+
+    await updateAttendance()
+    const result = await knex('classes')
+      .where('id', classId)
+      .update({ is_submitted: true }, 'id as classId')
+
+    return { message: `Updated the attendance for class ${result[0]}` }
   }
-
-  await updateAttendance()
-
-  await knex('classes').where('id', classId).update({ is_submitted: true })
+  return {
+    err: 'Submitting the attendance for a future class is not permitted.',
+  }
 }
 
 export default {
