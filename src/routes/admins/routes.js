@@ -17,8 +17,10 @@ const router = express.Router()
 router.get('/users', getUsers)
 router.get('/admins', getAdmins)
 router.put('/admins/:adminId', updateAdminRole)
+// no data is expected to be sent in req.body
 router.get('/volunteers', getVolunteers)
 router.put('/volunteers/:volunteerId', updateVolunteerRole)
+// no data is expected to be sent in req.body
 router.get('/students', getStudents)
 router.post('/classes', createNewClass)
 /* req.body should contain
