@@ -60,6 +60,18 @@ export const getStudents = async (req, res) => {
   }
 }
 
+export const getSignedUpClasses = async (req, res) => {
+  try {
+    const result = await services.getSignedUpClasses(req)
+    if (result.err) {
+      return res.status(404).send(result.err)
+    }
+    return res.json(result.classes)
+  } catch (err) {
+    return res.status(404).send('Classes not found.')
+  }
+}
+
 export const createNewClass = async (req, res) => {
   try {
     const result = await services.createNewClass(req)

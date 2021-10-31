@@ -310,6 +310,32 @@ const getStudents = async () => {
   return students
 }
 
+// this function returns the classIds of the classes admin has signed up for.
+const getSignedUpClasses = async (req) => {
+  const { userId } = req.user
+
+  const today = new Date()
+  today.setHours(0, 0, 0)
+
+  let classesSignedUp
+
+  try {
+    classesSignedUp = await knex('class_sign_ups as csu')
+      .select('csu.class_id as classId')
+      .join('classes as c', 'c.id', 'csu.class_id')
+      .where('csu.user_id', userId)
+      .andWhere('csu.is_cancelled', false)
+      .andWhere('c.date', '>=', today)
+      .orderBy('csu.class_id')
+  } catch (err) {
+    return { err: 'Unable to fetch classes.' }
+  }
+
+  const classes = classesSignedUp.map((classSignedUp) => classSignedUp.classId)
+
+  return { classes }
+}
+
 const createNewClass = async (req) => {
   const newClass = req.body
   const newClassDate = new Date(newClass.date)
@@ -482,6 +508,7 @@ export default {
   getVolunteers,
   updateVolunteerRole,
   getStudents,
+  getSignedUpClasses,
   createNewClass,
   getAttendance,
   updateClassAttendance,
