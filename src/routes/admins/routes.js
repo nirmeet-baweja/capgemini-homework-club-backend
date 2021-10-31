@@ -6,6 +6,7 @@ import {
   updateVolunteerRole,
   getStudents,
   getSignedUpClasses,
+  cancelClassSignUp,
   createNewClass,
   getClassDetails,
   updateClassAttendance,
@@ -24,6 +25,8 @@ router.put('/volunteers/:volunteerId', updateVolunteerRole)
 // no data is expected to be sent in req.body
 router.get('/students', getStudents)
 router.get('/class-sign-ups', getSignedUpClasses)
+router.put('/class-sign-ups/cancel/:classId', cancelClassSignUp)
+// no data is expected to be sent in req.body
 router.post('/classes', createNewClass)
 /* req.body should contain
   {

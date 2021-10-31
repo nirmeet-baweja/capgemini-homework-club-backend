@@ -338,6 +338,24 @@ const getSignedUpClasses = async (req) => {
   return { classes }
 }
 
+const cancelClassSignUp = async (req) => {
+  const { userId } = req.user
+  const { classId } = req.params
+
+  let classToCancel
+
+  try {
+    classToCancel = await knex('class_sign_ups')
+      .update({ is_cancelled: true }, 'class_id')
+      .where('user_id', userId)
+      .andWhere('class_id', classId)
+  } catch (err) {
+    return { err: 'Unable to update class sign up.' }
+  }
+
+  return classToCancel[0]
+}
+
 const createNewClass = async (req) => {
   const newClass = req.body
   const newClassDate = new Date(newClass.date)
@@ -504,15 +522,16 @@ const updateClassAttendance = async (req) => {
 }
 
 export default {
-  getClassDetails,
   getUsers,
+  getAdmins,
   updateAdminRole,
   getVolunteers,
   updateVolunteerRole,
   getStudents,
   getSignedUpClasses,
+  cancelClassSignUp,
   createNewClass,
+  getClassDetails,
   getAttendance,
   updateClassAttendance,
-  getAdmins,
 }
