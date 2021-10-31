@@ -40,6 +40,7 @@ const getStudentsSignedUp = async (classId) => {
     .join('skills as s', 's.id', 'csu.skill_id')
     .where('csu.class_id', classId)
     .andWhere('u.role_id', 3)
+    .orderBy('u.firstname')
 
   return listOfStudents
 }
@@ -59,6 +60,7 @@ const getVolunteersSignedUp = async (classId) => {
       this.where('u.role_id', adminRoleId).orWhere('u.role_id', volunteerRoleId)
     })
     .andWhere('csu.class_id', classId)
+    .orderBy(['u.role_id', 'u.firstname'])
 
   // function to fetch the skills for each volunteer
   const fetchUserSkills = async () => {
