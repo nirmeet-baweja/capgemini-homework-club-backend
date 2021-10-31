@@ -13,6 +13,7 @@ const getNumOfStudents = async (classId) => {
     .join('users as u', 'u.id', 'csu.user_id')
     .where('csu.class_id', classId)
     .andWhere('u.role_id', studentRoleId)
+    .andWhere('csu.is_cancelled', false)
     .count('u.id')
 
   return numOfStudents[0].count
@@ -26,6 +27,7 @@ const getNumOfVolunteers = async (classId) => {
       this.where('u.role_id', adminRoleId).orWhere('u.role_id', volunteerRoleId)
     })
     .andWhere('csu.class_id', classId)
+    .andWhere('csu.is_cancelled', false)
     .count('u.id')
 
   return numOfVolunteers[0].count
