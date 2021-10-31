@@ -161,7 +161,7 @@ const getUsers = async () => {
       'r.name as role'
     )
     .join('roles as r', 'r.id', 'u.role_id')
-    .orderBy('u.id')
+    .orderBy(['r.id', 'u.firstname'])
 
   return users
 }
@@ -212,7 +212,7 @@ const getVolunteers = async () => {
   const volunteers = await knex('users')
     .select('id', 'firstname as firstName', 'last_name as lastName', 'email')
     .where('role_id', 2)
-    .orderBy('id')
+    .orderBy('firstname')
 
   // function to fetch the skills and attendance for each volunteer
   const fetchUserSkillsAndAttendance = async () => {
@@ -282,7 +282,7 @@ const getStudents = async () => {
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
     .where('role_id', 3)
     .groupBy('u.id', 'c.name')
-    .orderBy('u.id')
+    .orderBy('u.firstname')
 
   // function to fetch the attendance for each student
   const fetchStudentsAttendance = async () => {
