@@ -33,6 +33,7 @@ const getStudentsSignedUp = async (classId) => {
       'u.firstname as firstName',
       'u.last_name as lastName',
       's.name as skill',
+      'csu.comments as studentComments',
       'csu.is_cancelled as isCancelled',
       'csu.is_present as isPresent'
     )
@@ -52,6 +53,7 @@ const getVolunteersSignedUp = async (classId) => {
       'u.id',
       'u.firstname as firstName',
       'u.last_name as lastName',
+      'csu.comments as volunteerComments',
       'csu.is_cancelled as isCancelled',
       'csu.is_present as isPresent'
     )
