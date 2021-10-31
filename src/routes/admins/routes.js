@@ -10,6 +10,8 @@ import {
   updateClassAttendance,
   getAttendance,
   getAdmins,
+  deleteStudent,
+  deleteVolunteer,
 } from './controllers'
 
 const router = express.Router()
@@ -19,7 +21,9 @@ router.get('/admins', getAdmins)
 router.put('/admins/:adminId', updateAdminRole)
 router.get('/volunteers', getVolunteers)
 router.put('/volunteers/:volunteerId', updateVolunteerRole)
+router.delete('/volunteer/:userId', deleteVolunteer)
 router.get('/students', getStudents)
+router.delete('/students/:userId', deleteStudent)
 router.post('/classes', createNewClass)
 /* req.body should contain
   {

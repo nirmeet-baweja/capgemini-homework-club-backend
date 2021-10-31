@@ -454,7 +454,61 @@ const updateClassAttendance = async (req) => {
 
   await knex('classes').where('id', classId).update({ is_submitted: true })
 }
-
+// Deleting the students and volunteers with connected tables
+const deleteClassSignUp = async (req) => {
+  const { userId } = req.params
+  try {
+    const studentClassSignUps = await knex('class_sign_ups')
+      .select('id')
+      .where('user_id', userId)
+      .del()
+    return {
+      message: `Successfully deleted student with user class signUp ${studentClassSignUps} `,
+    }
+  } catch (error) {
+    return { err: 'Cannot delete student with class sign up.' }
+  }
+}
+const deleteUserSkills = async (req) => {
+  const { userId } = req.params
+  try {
+    const userSkills = await knex('user_skills')
+      .select('id')
+      .where('user_id', userId)
+      .del()
+    return {
+      message: `Successfully deleted student with user skills ${userSkills} `,
+    }
+  } catch (err) {
+    return { err: 'Cannot delete student with user skills.' }
+  }
+}
+const deleteStudent = async (req) => {
+  const { userId } = req.params
+  try {
+    const student = await knex('users')
+      .select('id')
+      .where('id', userId)
+      .andWhere('role_id', 3)
+      .del()
+    return { message: `Successfully deleted ${student} ` }
+  } catch (err) {
+    return { err: `Cannot delete student with id ${userId}.` }
+  }
+}
+const deleteVolunteer = async (req) => {
+  const { userId } = req.params
+  try {
+    const volunteer = await knex('users')
+      .select('id')
+      .where('id', userId)
+      .andWhere('role_id', 2)
+      .del()
+    return { message: `Successfully deleted ${volunteer} ` }
+  } catch (err) {
+    return { err: `Cannot delete volunteer with id ${userId}.` }
+  }
+}
 export default {
   getClassDetails,
   getUsers,
@@ -466,4 +520,8 @@ export default {
   getAttendance,
   updateClassAttendance,
   getAdmins,
+  deleteStudent,
+  deleteClassSignUp,
+  deleteUserSkills,
+  deleteVolunteer,
 }

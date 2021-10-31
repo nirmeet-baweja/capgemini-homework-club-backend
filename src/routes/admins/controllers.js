@@ -99,3 +99,23 @@ export const getAttendance = async (req, res) => {
     return res.status(404).send('Attendance not found.')
   }
 }
+export const deleteStudent = async (req, res) => {
+  try {
+    await services.deleteClassSignUp(req, res)
+    await services.deleteUserSkills(req, res)
+    await services.deleteStudent(req, res)
+    return res.sendStatus(201)
+  } catch (err) {
+    return res.status(400).send('Cannot delete student.')
+  }
+}
+export const deleteVolunteer = async (req, res) => {
+  try {
+    await services.deleteClassSignUp(req, res)
+    await services.deleteUserSkills(req, res)
+    await services.deleteVolunteer(req, res)
+    return res.sendStatus(201)
+  } catch (err) {
+    return res.status(400).send('Cannot delete volunteer.')
+  }
+}
