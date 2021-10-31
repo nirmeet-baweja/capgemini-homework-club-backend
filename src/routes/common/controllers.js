@@ -50,7 +50,6 @@ export const getClassWithId = async (req, res) => {
 }
 
 export const getUpcomingClasses = async (req, res) => {
-  // const today = new Date() // date should be in format "yyyy-mm-dd"
   try {
     const classes = await services.getClasses('upcoming')
     return res.json(classes)
@@ -60,7 +59,6 @@ export const getUpcomingClasses = async (req, res) => {
 }
 
 export const getPastClasses = async (req, res) => {
-  // const today = new Date() // date should be in format "yyyy-mm-dd"
   try {
     const classes = await services.getClasses('past')
     return res.json(classes)

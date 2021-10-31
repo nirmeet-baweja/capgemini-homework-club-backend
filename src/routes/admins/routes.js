@@ -5,6 +5,8 @@ import {
   getVolunteers,
   updateVolunteerRole,
   getStudents,
+  getSignedUpClasses,
+  cancelClassSignUp,
   createNewClass,
   getClassDetails,
   updateClassAttendance,
@@ -19,11 +21,17 @@ const router = express.Router()
 router.get('/users', getUsers)
 router.get('/admins', getAdmins)
 router.put('/admins/:adminId', updateAdminRole)
+// no data is expected to be sent in req.body
 router.get('/volunteers', getVolunteers)
 router.put('/volunteers/:volunteerId', updateVolunteerRole)
 router.delete('/volunteer/:userId', deleteVolunteer)
 router.get('/students', getStudents)
 router.delete('/students/:userId', deleteStudent)
+// no data is expected to be sent in req.body
+router.get('/students', getStudents)
+router.get('/class-sign-ups', getSignedUpClasses)
+router.put('/class-sign-ups/cancel/:classId', cancelClassSignUp)
+// no data is expected to be sent in req.body
 router.post('/classes', createNewClass)
 /* req.body should contain
   {
