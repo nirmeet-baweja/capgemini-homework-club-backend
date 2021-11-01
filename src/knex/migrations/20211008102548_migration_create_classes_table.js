@@ -3,7 +3,7 @@ exports.up = function (knex) {
     table.increments().primary()
     table.timestamp('date').defaultTo(knex.fn.now())
     table.timestamp('created_at').defaultTo(knex.fn.now())
-    table.string('comments', 255)
+    table.string('comments')
     table.string('call_link', 255)
     table.boolean('is_submitted').notNullable().defaultTo(false)
   })

@@ -1,5 +1,9 @@
 import knex from '../../knex'
 
+const adminRoleId = 1
+const volunteerRoleId = 2
+const studentRoleId = 3
+
 /* ************************************************************************* */
 /* Helper functions */
 
@@ -8,7 +12,8 @@ const getNumOfStudents = async (classId) => {
   const numOfStudents = await knex('class_sign_ups as csu')
     .join('users as u', 'u.id', 'csu.user_id')
     .where('csu.class_id', classId)
-    .andWhere('u.role_id', 3)
+    .andWhere('u.role_id', studentRoleId)
+    .andWhere('csu.is_cancelled', false)
     .count('u.id')
 
   return numOfStudents[0].count
@@ -18,8 +23,11 @@ const getNumOfVolunteers = async (classId) => {
   // get the number of volunteers signed up for the class
   const numOfVolunteers = await knex('class_sign_ups as csu')
     .join('users as u', 'u.id', 'csu.user_id')
-    .where('csu.class_id', classId)
-    .andWhere('u.role_id', 2)
+    .where(function () {
+      this.where('u.role_id', adminRoleId).orWhere('u.role_id', volunteerRoleId)
+    })
+    .andWhere('csu.class_id', classId)
+    .andWhere('csu.is_cancelled', false)
     .count('u.id')
 
   return numOfVolunteers[0].count
@@ -90,7 +98,7 @@ const getClasses = async (type) => {
           'c.is_submitted as isSubmitted'
         )
         .where('date', '<=', today)
-        .orderBy('date')
+        .orderBy('date', 'desc')
       break
     default:
       classes = undefined

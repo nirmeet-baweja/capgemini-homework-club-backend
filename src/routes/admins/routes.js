@@ -1,10 +1,13 @@
 import express from 'express'
 import {
   getUsers,
+  getAdmins,
   updateAdminRole,
   getVolunteers,
   updateVolunteerRole,
   getStudents,
+  getSignedUpClasses,
+  cancelClassSignUp,
   createNewClass,
   getClassDetails,
   updateClassAttendance,
@@ -16,10 +19,16 @@ import {
 const router = express.Router()
 // localhost:3001/admins
 router.get('/users', getUsers)
+router.get('/admins', getAdmins)
 router.put('/admins/:adminId', updateAdminRole)
+// no data is expected to be sent in req.body
 router.get('/volunteers', getVolunteers)
 router.put('/volunteers/:volunteerId', updateVolunteerRole)
+// no data is expected to be sent in req.body
 router.get('/students', getStudents)
+router.get('/class-sign-ups', getSignedUpClasses)
+router.put('/class-sign-ups/cancel/:classId', cancelClassSignUp)
+// no data is expected to be sent in req.body
 router.post('/classes', createNewClass)
 /* req.body should contain
   {

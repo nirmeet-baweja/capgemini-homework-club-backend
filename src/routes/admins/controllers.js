@@ -9,6 +9,15 @@ export const getUsers = async (req, res) => {
   }
 }
 
+export const getAdmins = async (req, res) => {
+  try {
+    const admins = await services.getAdmins()
+    return res.json(admins)
+  } catch (err) {
+    return res.status(404).send('Admins not found.')
+  }
+}
+
 export const updateAdminRole = async (req, res) => {
   try {
     const result = await services.updateAdminRole(req)
@@ -17,7 +26,7 @@ export const updateAdminRole = async (req, res) => {
     }
     return res.status(201).send(result)
   } catch (err) {
-    return res.status(400).send('Class attendance not submitted.')
+    return res.status(400).send('Failed to change the user role.')
   }
 }
 
@@ -38,7 +47,7 @@ export const updateVolunteerRole = async (req, res) => {
     }
     return res.status(201).send(result)
   } catch (err) {
-    return res.status(400).send('Class attendance not submitted.')
+    return res.status(400).send('Failed to change the user role.')
   }
 }
 
@@ -48,6 +57,32 @@ export const getStudents = async (req, res) => {
     return res.json(students)
   } catch (err) {
     return res.status(404).send('Students not found.')
+  }
+}
+
+export const getSignedUpClasses = async (req, res) => {
+  try {
+    const result = await services.getSignedUpClasses(req)
+    if (result.err) {
+      return res.status(404).send(result.err)
+    }
+    return res.json(result.classes)
+  } catch (err) {
+    return res.status(404).send('Classes not found.')
+  }
+}
+
+export const cancelClassSignUp = async (req, res) => {
+  try {
+    const result = await services.cancelClassSignUp(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res
+      .status(200)
+      .send({ message: `Cancelled the sign-up for class ${result}` })
+  } catch (err) {
+    return res.status(400).send('Unable to cancel class sign up.')
   }
 }
 
@@ -75,8 +110,11 @@ export const getClassDetails = async (req, res) => {
 
 export const updateClassAttendance = async (req, res) => {
   try {
-    await services.updateClassAttendance(req)
-    return res.sendStatus(201)
+    const result = await services.updateClassAttendance(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res.status(201).send(result)
   } catch (err) {
     return res.status(400).send('Class attendance not submitted.')
   }
