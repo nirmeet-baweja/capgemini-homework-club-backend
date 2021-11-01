@@ -71,6 +71,7 @@ const signUpForClass = async (req) => {
             class_id: classId,
             skill_id: skillId,
             is_cancelled: false,
+            is_present: false,
             comments,
           },
           'class_id'
@@ -90,7 +91,7 @@ const signUpForClass = async (req) => {
     } catch (err) {
       return { err: 'Unable to sign up for class.' }
     }
-    return classSignedUp[0]
+    return classDetails
   }
   return {
     err: 'Cut-off time for the class sign-up is over, you can no longer sign up for this class.',
