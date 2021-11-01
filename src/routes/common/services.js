@@ -50,12 +50,12 @@ const getRoles = async () => {
 }
 
 const getSkills = async () => {
-  const skills = await knex('skills').select('*').orderBy('id')
+  const skills = await knex('skills').select('*').orderBy('name')
   return skills
 }
 
 const getCohorts = async () => {
-  const cohorts = await knex('cohorts').select('*').orderBy('id')
+  const cohorts = await knex('cohorts').select('*').orderBy('name')
   return cohorts
 }
 
