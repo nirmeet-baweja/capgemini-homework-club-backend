@@ -77,33 +77,6 @@ const sendEmail = async (user, token) => {
     return 'An internal error occurred, unable to send the email.'
   }
 }
-// const sendConfirmation = (user) => {
-//   var smtpTransport = createTransport("SMTP",{
-//     service: "mail",
-//     auth: {
-//         user: "debby21@mail.com",
-//         pass: "gmail_password"
-//     }
-//   });
-
-//   var mail = {
-//     from: "debby21@mail.com",
-//     to: user.email,
-//     subject: "Send Email Using Node.js",
-//     text: "Node.js New world for me",
-//     html: "<b>Node.js New world for me</b>"
-//   }
-
-//   smtpTransport.sendMail(mail, function(error, response){
-//     if(error){
-//         console.log(error);
-//     }else{
-//         console.log("Message sent: " + response.message);
-//     }
-
-//     smtpTransport.close();
-//   });
-// }
 
 /* *************************************************************** */
 
