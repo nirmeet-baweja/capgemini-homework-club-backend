@@ -529,6 +529,44 @@ const updateClassAttendance = async (req) => {
   }
 }
 
+const createNewCohort = async (req) => {
+  const newCohort = req.body
+  if (!newCohort.cohortName) {
+    return { err: 'Missing cohort name.' }
+  }
+  const existingCohort = await knex('cohorts')
+    .select('id')
+    .where('name', newCohort.cohortName)
+
+  if (existingCohort.length > 0) {
+    return { err: 'This cohort already exists.' }
+  }
+  const [result] = await knex('cohorts').insert(
+    { name: newCohort.cohortName },
+    ['id as cohortId', 'name as cohortName']
+  )
+  return result
+}
+
+const createNewSkill = async (req) => {
+  const newSkill = req.body
+  if (!newSkill.skillName) {
+    return { err: 'Missing skill name.' }
+  }
+  const existingSkill = await knex('skills')
+    .select('id')
+    .where('name', newSkill.skillName)
+
+  if (existingSkill.length > 0) {
+    return { err: 'This skill already exists.' }
+  }
+  const [result] = await knex('skills').insert({ name: newSkill.skillName }, [
+    'id as skillId',
+    'name as skillName',
+  ])
+  return result
+}
+
 export default {
   getUsers,
   getAdmins,
@@ -542,4 +580,6 @@ export default {
   getClassDetails,
   getAttendance,
   updateClassAttendance,
+  createNewCohort,
+  createNewSkill,
 }
