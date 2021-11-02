@@ -7,7 +7,7 @@ const config = {
   appUrl: process.env.APP_URL,
   tokenSecret: process.env.TOKEN_SECRET,
   sendGridKey: process.env.SENDGRID_API_KEY,
-  email: process.env.EMAIL_ADDRESS,
+  email: process.env.EMAIL,
   frontEndUrl: process.env.FRONTEND_URL,
 }
 
