@@ -31,7 +31,7 @@ const sendEmail = async (user, data) => {
     to: user.email,
     from: config.email, // your email
     subject: 'Class signUp',
-    html: confirmationEmail(data),
+    html: confirmationEmail(data, user),
   }
   try {
     await sgMail.send(msg)
