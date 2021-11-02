@@ -24,10 +24,10 @@ const getStudentCutOffDate = (classDate) => {
   return cutOffDate
 }
 
-const sendEmail = async (data) => {
+const sendEmail = async (user) => {
   sgMail.setApiKey(config.sendGridKey)
   const msg = {
-    to: data.email,
+    to: user.email,
     from: config.email, // your email
     subject: 'Class signUp',
     html: `
@@ -80,7 +80,7 @@ const sendEmail = async (data) => {
                             font-size: 14px;
                             line-height: 1.2rem;
                           ">
-                                Dear ${data.firstName},
+                                Dear ${user.firstName},
                             </p>
                             <p style="
                             margin-top: 0;
