@@ -66,7 +66,7 @@ const sendEmail = async (user, token) => {
     <p>Hi ${user.firstname},</p>
     <p>You requested to reset your password.</p>
     <p> Please, click the link below to reset your password</p>
-       <a href="${config.frontEndUrl}/reset-password/${token}"></a>
+       <a href="${config.frontEndUrl}/reset-password/${token}">${token}</a>
      `,
   }
   try {
