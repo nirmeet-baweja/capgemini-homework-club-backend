@@ -1,5 +1,8 @@
+import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
 import services from '../common/services'
+import { volunteerConfirmationEmail } from '../../utils'
+import config from '../../config'
 
 const cutOffTime = 16 // set it as 4pm
 
@@ -19,6 +22,22 @@ const getVolunteerCutOffDate = (classDate) => {
   return cutOffDate
 }
 
+const sendEmail = async (user, data) => {
+  sgMail.setApiKey(config.sendGridKey)
+  const msg = {
+    to: user.email,
+    from: config.email, // your email
+    subject: 'Class signUp',
+    html: volunteerConfirmationEmail(data),
+  }
+  try {
+    await sgMail.send(msg)
+    return undefined
+  } catch (error) {
+    console.error(error.toString())
+    return 'An internal error occurred, unable to send the email.'
+  }
+}
 /* *************************************************************** */
 
 const getSignedUpClasses = async (req) => {
@@ -80,6 +99,7 @@ const signUpForClass = async (req) => {
         return { err: classDetails.err }
       }
       classDetails = { ...classDetails, userComments: comments }
+      sendEmail(req.user, classDetails)
     } catch (err) {
       return { err: 'Unable to sign up for class.' }
     }

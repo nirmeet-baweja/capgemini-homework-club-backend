@@ -1,7 +1,7 @@
 import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
 import services from '../common/services'
-import { confirmationEmail } from '../../utils'
+import { studentConfirmationEmail } from '../../utils'
 import config from '../../config'
 
 const cutOffTime = 17 // set it as 5pm
@@ -31,7 +31,7 @@ const sendEmail = async (user, data) => {
     to: user.email,
     from: config.email, // your email
     subject: 'Class signUp',
-    html: confirmationEmail(data, user),
+    html: studentConfirmationEmail(data, user),
   }
   try {
     await sgMail.send(msg)
