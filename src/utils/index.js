@@ -328,9 +328,7 @@ export const volunteerConfirmationEmail = (data) => `
   </html>
   `
 
-export const sendEmailForResetLink = (user, token) => {
-  console.log(user)
-  return `
+export const sendEmailForPasswordResetLink = (user, token) => `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -393,7 +391,7 @@ export const sendEmailForResetLink = (user, token) => {
                         font-size: 14px;
                         line-height: 1.2rem;
                       ">
-                      You requested to reset your password..
+                      You have requested to reset your password..
                         </p>
                               <p style="
                               margin-top: 0;
@@ -479,4 +477,3 @@ export const sendEmailForResetLink = (user, token) => {
   </body>
   </html>
    `
-}

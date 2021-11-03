@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
-import { sendEmailForResetLink } from '../../utils'
+import { sendEmailForPasswordResetLink } from '../../utils'
 import config from '../../config'
 
 const saltRounds = 2
@@ -62,7 +62,7 @@ const sendEmail = async (user, token) => {
     to: user.email,
     from: config.email, // your email
     subject: 'Reset password requested',
-    html: sendEmailForResetLink(user, token),
+    html: sendEmailForPasswordResetLink(user, token),
   }
   try {
     await sgMail.send(msg)
@@ -75,7 +75,7 @@ const sendEmail = async (user, token) => {
 
 /* *************************************************************** */
 
-const signIn = async (req) => {
+async function signIn(req) {
   const { email, password } = req.body
   const [user] = await knex('users as u')
     .join('roles as r', 'r.id', 'u.role_id')
