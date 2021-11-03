@@ -259,7 +259,7 @@ export const volunteerConfirmationEmail = (data) => `
                         font-size: 14px;
                         line-height: 1.2rem;
                       ">
-                        We want to inform you that ${data.firstname}, has booked for a class scheduled on ${data.date}. Please read our students' message ${data.userComments} to you.
+                        We want to inform you that ${data.numOfStudents} students have booked for the class scheduled on ${data.date}.If you have any query, please send a message to the admin for more information.
                         </p>
                           <br />
                           <p style="
