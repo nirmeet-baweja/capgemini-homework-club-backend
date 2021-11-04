@@ -71,14 +71,14 @@ export const sendEmailForPasswordResetLink = (user, token) => `
       <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0; font-family: Arial, Helvetica, sans-serif;">
           <tbody width="100%">
               <tr style="width: 100%;">
-                  <td style="width: 35%;">
+                  <td style="width: 33%;">
                       <div style="background-color: #59bfff; height: 226px;"></div>
                   </td>
                   <td>
                       <img style="width: 570px; height: 226px; margin: 0 10px;" alt="cyf-email-05"
                           src="https://isg-one.com/images/default-source/default-album/capgemini-altran-acquisition.tmb-th1190-446.jpg?sfvrsn=526bc031_0" />
                   </td>
-                  <td style="width: 35%;">
+                  <td style="width: 33%;">
                       <div style="background-color: #59bfff; height: 226px;"></div>
                   </td>
               </tr>
