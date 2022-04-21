@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   getUsers,
+  getAdmins,
   updateAdminRole,
   getVolunteers,
   updateVolunteerRole,
@@ -11,9 +12,10 @@ import {
   getClassDetails,
   updateClassAttendance,
   getAttendance,
-  getAdmins,
   deleteStudent,
   deleteVolunteer,
+  createNewCohort,
+  createNewSkill,
 } from './controllers'
 
 const router = express.Router()
@@ -51,5 +53,17 @@ router.put('/class-details/:classId', updateClassAttendance)
 ]
 */
 router.get('/attendance', getAttendance)
+router.post('/cohorts', createNewCohort)
+/* req.body should contain
+  {
+    cohortName: 'London Class 8',
+  }
+*/
+router.post('/skills', createNewSkill)
+/* req.body should contain
+  {
+    skillName: 'New skill',
+  }
+*/
 
 export default router

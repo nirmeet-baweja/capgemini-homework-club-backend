@@ -106,8 +106,11 @@ const getClassesAttended = async (userId) => {
   const classesAttended = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+    .join('classes as c', 'c.id', 'csu.class_id')
     .where('u.id', userId)
     .andWhere('csu.is_present', true)
+    .andWhere('csu.is_cancelled', false)
+    .andWhere('c.is_submitted', true)
     .count('csu.class_id as classesAttended')
     .groupBy('u.id')
 
@@ -125,8 +128,11 @@ const getClassesMissed = async (userId) => {
   const classesMissed = await knex('users as u')
     .select('u.id')
     .join('class_sign_ups as csu', 'u.id', 'csu.user_id')
+    .join('classes as c', 'c.id', 'csu.class_id')
     .where('u.id', userId)
     .andWhere('csu.is_present', false)
+    .andWhere('csu.is_cancelled', false)
+    .andWhere('c.is_submitted', true)
     .count('csu.class_id as classesMissed')
     .groupBy('u.id')
 
@@ -577,6 +583,45 @@ const deleteVolunteer = async (req) => {
     return { err: `Cannot delete volunteer with id ${userId}.` }
   }
 }
+
+const createNewCohort = async (req) => {
+  const newCohort = req.body
+  if (!newCohort.cohortName) {
+    return { err: 'Missing cohort name.' }
+  }
+  const existingCohort = await knex('cohorts')
+    .select('id')
+    .where('name', newCohort.cohortName)
+
+  if (existingCohort.length > 0) {
+    return { err: 'This cohort already exists.' }
+  }
+  const [result] = await knex('cohorts').insert(
+    { name: newCohort.cohortName },
+    ['id as cohortId', 'name as cohortName']
+  )
+  return result
+}
+
+const createNewSkill = async (req) => {
+  const newSkill = req.body
+  if (!newSkill.skillName) {
+    return { err: 'Missing skill name.' }
+  }
+  const existingSkill = await knex('skills')
+    .select('id')
+    .where('name', newSkill.skillName)
+
+  if (existingSkill.length > 0) {
+    return { err: 'This skill already exists.' }
+  }
+  const [result] = await knex('skills').insert({ name: newSkill.skillName }, [
+    'id as skillId',
+    'name as skillName',
+  ])
+  return result
+}
+
 export default {
   getUsers,
   getAdmins,
@@ -594,4 +639,6 @@ export default {
   deleteClassSignUp,
   deleteUserSkills,
   deleteVolunteer,
+  createNewCohort,
+  createNewSkill,
 }

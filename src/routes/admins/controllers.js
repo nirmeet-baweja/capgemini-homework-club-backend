@@ -148,3 +148,26 @@ export const deleteVolunteer = async (req, res) => {
     return res.status(400).send('Cannot delete volunteer.')
   }
 }
+export const createNewCohort = async (req, res) => {
+  try {
+    const result = await services.createNewCohort(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res.status(201).send(result)
+  } catch (err) {
+    return res.status(400).send('Failed to create cohort.')
+  }
+}
+
+export const createNewSkill = async (req, res) => {
+  try {
+    const result = await services.createNewSkill(req)
+    if (result.err) {
+      return res.status(400).send(result.err)
+    }
+    return res.status(201).send(result)
+  } catch (err) {
+    return res.status(400).send('Failed to create skill.')
+  }
+}

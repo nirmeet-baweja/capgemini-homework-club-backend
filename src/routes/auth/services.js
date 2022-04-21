@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import sgMail from '@sendgrid/mail'
 import knex from '../../knex'
+import { sendEmailForPasswordResetLink } from '../../utils'
 import config from '../../config'
 
 const saltRounds = 2
@@ -61,13 +62,7 @@ const sendEmail = async (user, token) => {
     to: user.email,
     from: config.email, // your email
     subject: 'Reset password requested',
-    html: `
-
-    <p>Hi ${user.firstname},</p>
-    <p>You requested to reset your password.</p>
-    <p> Please, click the link below to reset your password</p>
-       <a href="${config.frontEndUrl}/reset-password/${token}">${token}</a>
-     `,
+    html: sendEmailForPasswordResetLink(user, token),
   }
   try {
     await sgMail.send(msg)
@@ -77,37 +72,10 @@ const sendEmail = async (user, token) => {
     return 'An internal error occurred, unable to send the email.'
   }
 }
-// const sendConfirmation = (user) => {
-//   var smtpTransport = createTransport("SMTP",{
-//     service: "mail",
-//     auth: {
-//         user: "debby21@mail.com",
-//         pass: "gmail_password"
-//     }
-//   });
-
-//   var mail = {
-//     from: "debby21@mail.com",
-//     to: user.email,
-//     subject: "Send Email Using Node.js",
-//     text: "Node.js New world for me",
-//     html: "<b>Node.js New world for me</b>"
-//   }
-
-//   smtpTransport.sendMail(mail, function(error, response){
-//     if(error){
-//         console.log(error);
-//     }else{
-//         console.log("Message sent: " + response.message);
-//     }
-
-//     smtpTransport.close();
-//   });
-// }
 
 /* *************************************************************** */
 
-const signIn = async (req) => {
+async function signIn(req) {
   const { email, password } = req.body
   const [user] = await knex('users as u')
     .join('roles as r', 'r.id', 'u.role_id')
