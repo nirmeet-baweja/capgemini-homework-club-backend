@@ -26,7 +26,7 @@ const getStudentCutOffDate = (classDate) => {
 
 const getSignedUpClasses = async (req) => {
   const { userId } = req.user
-
+  console.log(req.user)
   const today = new Date()
   today.setHours(0, 0, 0)
 
@@ -51,6 +51,7 @@ const getSignedUpClasses = async (req) => {
 
 const signUpForClass = async (req) => {
   const { userId } = req.user
+  console.log(req.user)
   const { classId } = req.params
   const { comments, skillId } = req.body
 
@@ -62,7 +63,6 @@ const signUpForClass = async (req) => {
   if (isSignUpAllowed) {
     let classSignedUp
     let classDetails
-
     try {
       classSignedUp = await knex('class_sign_ups')
         .insert(
