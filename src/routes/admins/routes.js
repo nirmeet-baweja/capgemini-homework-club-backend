@@ -12,6 +12,8 @@ import {
   getClassDetails,
   updateClassAttendance,
   getAttendance,
+  deleteStudent,
+  deleteVolunteer,
   createNewCohort,
   createNewSkill,
 } from './controllers'
@@ -24,6 +26,9 @@ router.put('/admins/:adminId', updateAdminRole)
 // no data is expected to be sent in req.body
 router.get('/volunteers', getVolunteers)
 router.put('/volunteers/:volunteerId', updateVolunteerRole)
+router.delete('/volunteer/:userId', deleteVolunteer)
+router.get('/students', getStudents)
+router.delete('/students/:userId', deleteStudent)
 // no data is expected to be sent in req.body
 router.get('/students', getStudents)
 router.get('/class-sign-ups', getSignedUpClasses)
